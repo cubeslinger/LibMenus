@@ -1,0 +1,14 @@
+Identifier  =  "__menus"
+Name        =  { English = "__menus" }
+NameShort   =  "__menus"
+Version     =  "0.0.1"
+Description =  { English = "Library to build menus" }
+Author      =  "marcob@marcob.org"
+Website     =  "https://github.com/cubeslinger/__menus"
+Email       =  "marcob@marcob.org"
+Environment =  "4.0"
+
+
+RunOnStartup = {
+   "__menus.lua",
+}
