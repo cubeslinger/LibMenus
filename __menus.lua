@@ -20,6 +20,7 @@ function menu()
                   initialized =  false,
                   maxwidth    =  0,
                   maxlen      =  0,
+                  basewidth   =  100
                   }
 
    local function round(num, digits)
@@ -54,7 +55,8 @@ function menu()
 
       -- Main Window
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, t.parent)
-      self.o.menu:SetBackgroundColor(unpack(self.color.green))
+      self.o.menu:SetBackgroundColor(unpack(self.color.black))
+      self.o.menu:SetWidth(self.basewidth)
 
       if t.parent ~= nil and next(t,parent) then
          self.o.menu:SetPoint("TOPLEFT", t.parent, "TOPRIGHT")
@@ -100,7 +102,7 @@ function menu()
             local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
             v:SetFontSize(fs)
             v:SetText(tbl.name)
-            v:SetBackgroundColor(unpack(self.color.green))
+            v:SetBackgroundColor(unpack(self.color.black))
             v:SetLayer(12)
 --             v:SetPoint("TOPLEFT",      vf, "TOPLEFT",       0, 2)
 --             v:SetPoint("TOPRIGHT",     vf, "TOPRIGHT",      0, 2)
