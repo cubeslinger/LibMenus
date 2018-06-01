@@ -3,7 +3,7 @@
 -- Author      marcob@marcob.org
 -- StartDate   30/05/2018
 --
-function menu(parent, t)
+function menu()
    -- the new instance
    local self =   {
                   menuid      =  0,
@@ -18,6 +18,7 @@ function menu(parent, t)
                                  },
                   borders     =  { l=2, r=2, t=2, b=2 },               -- Left, Right, Top, Bottom
                   status      =  {},
+                  initialized =  false,
                   maxwidth    =  0,
                   maxlen      =  0,
                   basewidth   =  100
@@ -29,15 +30,12 @@ function menu(parent, t)
 
       return floor(num * mult + .5) / mult
    end
-   
-   function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
-   function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-      
-      
+
    --
    -- t  =  {  parent=[],                          -- parent menu or nil (need x and y)
    --          fontsize=[],                        -- defaults to
    --          fontface=[],                        -- defaults to Rift Font
+   --          hide=[],                            -- defaults to start hidden, use :show() to reveal the menu             
    --          voices=< {
    --                      { name="", [callback=""], [type="submenu||check"] },
    --                      { name="", [callback="function()||'_submenu_'], [submenu={}] },
@@ -45,8 +43,10 @@ function menu(parent, t)
    --                   } >,
    --       }
    --
---    function self.new(parent, t)
+   function self.new(parent, t)
       print(string.format("new(%s, %s)", parent, t))
+
+      if not initialized then self = menu() end
 
       self.menuid       =  (self.menuid + 1)
       if self.status[self.menuid]   == nil   then
@@ -127,13 +127,13 @@ function menu(parent, t)
 --                   self.o.sub[self.menuid][self.submenuid].menu = menu()
 --                   self.o.sub[self.menuid][self.submenuid].data = new(v, tbl.submenu)
 
-                  self.o.sub[self.menuid][self.submenuid]      =  menu(v, tbl.submenu)
---                   self.o.sub[self.menuid][self.submenuid].data =  self.new(v, tbl.submenu)
+                  self.o.sub[self.menuid][self.submenuid]      =  self.menu()
+                  self.o.sub[self.menuid][self.submenuid].data =  self.new(v, tbl.submenu)
 
 
                   
                   v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                     self.o.sub[self.menuid][self.submenuid]:show()
+                                                                     self.o.sub[self.menuid][self.submenuid].menu:show()
                                                                   end,
                                                                   "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )           
                else
@@ -178,12 +178,14 @@ function menu(parent, t)
       local w = lastvoiceframe:GetRight() - lastvoiceframe:GetLeft()
       self.o.menu:SetWidth(math.max(self.o.menu:GetWidth(), w))
 
-      self.o.menu:SetVisible(false)
+      if not t.hide then self.o.menu:SetVisible(true) end
 
---       return self
---    end
+      return self
+   end
 
 
+   function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true) end end
+   function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false) end end
 
    -- return the class instance
    return self

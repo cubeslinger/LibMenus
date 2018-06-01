@@ -3,11 +3,10 @@
 -- Author      marcob@marcob.org
 -- StartDate   30/05/2018
 --
-function menu(parent, t)
+function menu()
    -- the new instance
    local self =   {
                   menuid      =  0,
-                  submenuid   =  0,
                   o           =  {},
                   fontsize    =  12,
                   color       =  {  black  = {  0,   0,   0,   1},
@@ -18,6 +17,7 @@ function menu(parent, t)
                                  },
                   borders     =  { l=2, r=2, t=2, b=2 },               -- Left, Right, Top, Bottom
                   status      =  {},
+                  initialized =  false,
                   maxwidth    =  0,
                   maxlen      =  0,
                   basewidth   =  100
@@ -29,24 +29,21 @@ function menu(parent, t)
 
       return floor(num * mult + .5) / mult
    end
-   
-   function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
-   function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-      
-      
+
    --
    -- t  =  {  parent=[],                          -- parent menu or nil (need x and y)
+   --          voices=< {
+   --                      { name="", callback=""},
+   --                      { ... },
+   --                   },
    --          fontsize=[],                        -- defaults to
    --          fontface=[],                        -- defaults to Rift Font
-   --          voices=< {
-   --                      { name="", [callback=""], [type="submenu||check"] },
-   --                      { name="", [callback="function()||'_submenu_'], [submenu={}] },
-   --                      { ... },
-   --                   } >,
+   --          hide=[],                            -- defaults to start hidden, use :show() to reveal the menu
    --       }
    --
---    function self.new(parent, t)
-      print(string.format("new(%s, %s)", parent, t))
+   function self.new(t)
+
+      if not initialized then self = menu() end
 
       self.menuid       =  (self.menuid + 1)
       if self.status[self.menuid]   == nil   then
@@ -57,23 +54,18 @@ function menu(parent, t)
       local fs          =  t.fontsize or self.fontsize
 
       -- Main Window
-      print(string.format("PARENT=%s, menuid=%s, submenuid=%s", parent, self.menuid, self.submenuid))
-      for a,b in pairs(parent) do
-         print(string.format("a=%s, b=%s", a, b))
-      end
-      
-      self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
+      self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, t.parent)
       self.o.menu:SetBackgroundColor(unpack(self.color.black))
       self.o.menu:SetWidth(self.basewidth)
 
-      if parent ~= nil and next(parent) then
-         self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT")
+      if t.parent ~= nil and next(t,parent) then
+         self.o.menu:SetPoint("TOPLEFT", t.parent, "TOPRIGHT")
       else
          if t.x ~= nil and t.y ~= nil then
             -- we have coordinates
             self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", t.x, t.y)
          else
-            print(string.format("ERROR: __menu.lua: parent is %s, and (%s,%s)", parent, x, y))
+            print(string.format("ERROR: __menu.lua: t.parent is %s, and (%s,%s)", t.parent, x, y))
             return {}
          end
       end
@@ -91,11 +83,29 @@ function menu(parent, t)
                self.status[self.menuid][voiceid]   =  false
             end
 
+--             local vf =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voiceframe_" .. voiceid, lastvoiceframe)
+--             vf:SetHeight(fs + 4)
+--             vf:SetBackgroundColor(unpack(self.color.red))
+
+--             if voiceid == 1 then
+--                -- first voice attaches to framecontainer
+--                vf:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT")
+--                vf:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT")
+--             else
+--                -- other voices attach to last one
+--                vf:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
+--                vf:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+--             end
+
+
+--             local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, vf)
             local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
             v:SetFontSize(fs)
             v:SetText(tbl.name)
             v:SetBackgroundColor(unpack(self.color.black))
             v:SetLayer(12)
+--             v:SetPoint("TOPLEFT",      vf, "TOPLEFT",       0, 2)
+--             v:SetPoint("TOPRIGHT",     vf, "TOPRIGHT",      0, 2)
 
             if voiceid == 1 then
                -- first voice attaches to framecontainer
@@ -110,51 +120,22 @@ function menu(parent, t)
 
             if self.status[self.menuid] ~= nil then self.status[self.menuid]  =  {} end
 
-            -- ------------------------------
-            
-            if tbl.callback ~= nil and (tbl.callback == "_submenu_" or next(tbl.callback)) then
-               
-               -- SubMenu
-               if tbl.callback == "_submenu_" then
-                  
-                  self.submenuid  =  self.submenuid  + 1
-                  
-                  if self.o.sub  == nil               then self.o.sub               =  {} end
-                  if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
-                  
---                   self.o.sub[self.menuid][self.submenuid] =  self.menu()
---                   self.o.sub[self.menuid][self.submenuid] = {}
---                   self.o.sub[self.menuid][self.submenuid].menu = menu()
---                   self.o.sub[self.menuid][self.submenuid].data = new(v, tbl.submenu)
-
-                  self.o.sub[self.menuid][self.submenuid]      =  menu(v, tbl.submenu)
---                   self.o.sub[self.menuid][self.submenuid].data =  self.new(v, tbl.submenu)
-
-
-                  
-                  v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                     self.o.sub[self.menuid][self.submenuid]:show()
-                                                                  end,
-                                                                  "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )           
-               else
-                  v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                     tbl.callback()
-                                                                  end,
-                                                                  "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
-               end
+            if tbl.callback ~= nil and next(tbl.callback) then
+               v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
+                                                                  tbl.callback()
+                                                               end,
+                                                               "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
             else
                v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                   self.status[self.menuid][voiceid]   =  not self.status[self.menuid][voiceid]
                                                                end,
                                                                "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
             end
-            
-            -- ------------------------------            
 
             -- highligth menu voice on mousover
             v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
             v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(self.color.black)) end, "__mouse: highlight voice menu OFF")
-            
+
             local fb =  {}
             fb.left, fb.top, fb.right, fb.bottom  =  self.o.menu:GetBounds()
             local vb =  {}
@@ -178,12 +159,14 @@ function menu(parent, t)
       local w = lastvoiceframe:GetRight() - lastvoiceframe:GetLeft()
       self.o.menu:SetWidth(math.max(self.o.menu:GetWidth(), w))
 
-      self.o.menu:SetVisible(false)
+      if not t.hide then self.o.menu:SetVisible(true) end
 
---       return self
---    end
+      return self
+   end
 
 
+   function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true) end end
+   function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false) end end
 
    -- return the class instance
    return self
