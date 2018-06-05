@@ -30,28 +30,31 @@ function menu(parent, t)
 
       return floor(num * mult + .5) / mult
    end
-   
+
    function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
    function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-      
+   function self.flip() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
 
-   local function new(parent, t)
+
+   local function new(parent, t, oldself)
       --
       -- t  =  {  fontsize=[],                        -- defaults to
       --          fontface=[],                        -- defaults to Rift Font
       --          voices=< {
-      --                      { name="<v1_name>", [callback="function()||'_submenu_'], [submenu={}] },
-      --                      { name="<v2_name>", [callback="function()||'_submenu_'], [submenu={}] },
+      --                      { name="<voice1_name>", [callback="function()||'_submenu_'], [submenu={}] },
+      --                      { name="<voice2_name>", [callback="function()||'_submenu_'], [submenu={}] },
       --                      { ... },
       --                   } >,
       --       }
       --
+      if oldself then self =  oldself  end
+
       self.o.voices  =  {}
-      self.menuid    =  (self.menuid + 1)   
-      local fs       =  t.fontsize or self.fontsize        
+      self.menuid    =  (self.menuid + 1)
+      local fs       =  t.fontsize or self.fontsize
       if self.status[self.menuid]   == nil   then  self.status[self.menuid]   =  {} end
 
-      -- Main Window  
+      -- Main Window
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
       self.o.menu:SetBackgroundColor(unpack(self.color.black))
       self.o.menu:SetWidth(self.basewidth)
@@ -70,16 +73,18 @@ function menu(parent, t)
 
       local voiceid        =  0
       local lastvoiceframe =  self.o.menu
-      
+
       for _, tbl in pairs(t.voices) do
 
-         for var, val in pairs(tbl) do
-            
+         print(string.format("tbl.name=%s, tbl.callback=%s", tbl.name, tbl.callback))
+
+--          for var, val in pairs(tbl) do
+
             voiceid  =  voiceid + 1
-            
-            print(string.format("  __menu: (m=%s, s=%s, v=%s) processing voice: %s",  self.menuid, self.submenuid, voiceid, tbl.name))         
-            
-            if not next(self.status[self.menuid])           and 
+
+            print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
+
+            if not next(self.status[self.menuid])           and
                self.status[self.menuid][voiceid]   == nil   then
                self.status[self.menuid][voiceid]   =  false
             end
@@ -101,38 +106,35 @@ function menu(parent, t)
             end
 
             -- ------------------------------
-            
+
             if tbl.callback ~= nil and (tbl.callback ~= nil or next(tbl.callback))   then
-               
+
                print(string.format("$$$ tbl.callback = %s $$$", tbl.callback))
-               
+
                -- SubMenu
                if tbl.callback == "_submenu_" then
-                  
+
                   self.submenuid  =  self.submenuid  + 1
-                  
-                  if self.o.sub  == nil               then self.o.sub               =  {} end
-                  if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
-                  
+
+                  print("-> ££ CALLING MENU() ££")
+
+--                   local tt = new(v, tbl.submenu, self)
+                  local tt = menu(v, tbl.submenu)
                   local a, b = nil, nil
-                  for a, b in pairs(tbl.submenu) do 
-                     print(string.format("  __menu tbl.submenu: (m=%s, s=%s, v=%s) a=%s b=%s",  self.menuid, self.submenuid, voiceid, a, b))
-                     local c, d
-                     for c, d in pairs(b) do 
-                        local e, f
-                        for e, f in pairs(d) do 
-                           print(string.format("      __menu tbl.submenu: (m=%s, s=%s, v=%s) e=%s f=%s",  self.menuid, self.submenuid, voiceid, e, f))
-                        end
-                     end
+                  for a, b in pairs(tt) do
+                     print(string.format("      NEW: a=%s, b=%s",  a, b))
                   end
-                  
-                  print("££ CALLING MENU() ££")
-                  self.o.sub[self.menuid][self.submenuid]      =  menu(v, tbl.submenu)
-               
+
+                  if self.o.sub              == nil   then self.o.sub               =  {} end
+                  if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
+                  self.o.sub[self.menuid][self.submenuid]                           =  tt
+
+                  print("<- ££ CALLING MENU() ££")
+
                   v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                     self.o.sub[self.menuid][self.submenuid]:show()
+                                                                     self.o.sub[self.menuid][self.submenuid]:flip()
                                                                   end,
-                                                                  "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )           
+                                                                  "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )
                else
                   v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                      tbl.callback()
@@ -140,18 +142,19 @@ function menu(parent, t)
                                                                   "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
                end
             else
+
                v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                   self.status[self.menuid][voiceid]   =  not self.status[self.menuid][voiceid]
                                                                end,
                                                                "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
             end
-            
-            -- ------------------------------            
+
+            -- ------------------------------
 
             -- highligth menu voice on mousover
             v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
             v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(self.color.black)) end, "__mouse: highlight voice menu OFF")
-            
+
             local fb =  {}
             fb.left, fb.top, fb.right, fb.bottom  =  self.o.menu:GetBounds()
             local vb =  {}
@@ -164,7 +167,7 @@ function menu(parent, t)
             if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
             self.o.voices[self.menuid][voiceid] =  v
             lastvoiceframe                      =  v
-         end
+--          end
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
@@ -173,15 +176,16 @@ function menu(parent, t)
       self.o.menu:SetWidth(math.max(self.o.menu:GetWidth(), w))
 
       self.o.menu:SetVisible(false)
-   
-      return(self)
+
+      return self
    end
 
-      if parent ~= nil  and next(parent) ~= nil and
-         t      ~= nil  and next(t)      ~= nil then
-         
-         self  =  new(parent, t)
-      end
+   -- Initialize
+   if parent ~= nil  and next(parent) ~= nil and
+      t      ~= nil  and next(t)      ~= nil then
+
+      self  =  new(parent, t)
+   end
 
    -- return the class instance
    print("&& RETURNING MENU() &&")
