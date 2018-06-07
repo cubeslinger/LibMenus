@@ -77,48 +77,47 @@ function menu(parent, t)
       for _, tbl in pairs(t.voices) do
 
          print(string.format("tbl.name=%s, tbl.callback=%s", tbl.name, tbl.callback))
+         if type(tbl.callback) == 'table' then
+            local xx, zz = unpack(tbl.callback)
+            print(string.format("tbl.callback => %s(%s)", xx, zz))
+         end
 
---          for var, val in pairs(tbl) do
+         voiceid  =  voiceid + 1
 
-            voiceid  =  voiceid + 1
+         print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
 
-            print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
+         if not next(self.status[self.menuid])           and
+            self.status[self.menuid][voiceid]   == nil   then
+            self.status[self.menuid][voiceid]   =  false
+         end
 
-            if not next(self.status[self.menuid])           and
-               self.status[self.menuid][voiceid]   == nil   then
-               self.status[self.menuid][voiceid]   =  false
-            end
+         local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
+         v:SetFontSize(fs)
+         v:SetText(tbl.name)
+         v:SetBackgroundColor(unpack(self.color.black))
+         v:SetLayer(12)
 
-            local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
-            v:SetFontSize(fs)
-            v:SetText(tbl.name)
-            v:SetBackgroundColor(unpack(self.color.black))
-            v:SetLayer(12)
+         if voiceid == 1 then
+            -- first voice attaches to framecontainer
+            v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT")
+            v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT")
+         else
+            -- other voices attach to last one
+            v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
+            v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+         end
 
-            if voiceid == 1 then
-               -- first voice attaches to framecontainer
-               v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT")
-               v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT")
-            else
-               -- other voices attach to last one
-               v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
-               v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
-            end
+         -- ------------------------------
 
-            -- ------------------------------
-
-            if tbl.callback ~= nil and (tbl.callback ~= nil or next(tbl.callback))   then
-
-               print(string.format("$$$ tbl.callback = %s $$$", tbl.callback))
-
-               -- SubMenu
+         if tbl.callback ~= nil then
+            if type(tbl.callback) == 'string' then
                if tbl.callback == "_submenu_" then
 
                   self.submenuid  =  self.submenuid  + 1
 
                   print("-> ££ CALLING MENU() ££")
 
---                   local tt = new(v, tbl.submenu, self)
+                  --                   local tt = new(v, tbl.submenu, self)
                   local tt = menu(v, tbl.submenu)
                   local a, b = nil, nil
                   for a, b in pairs(tt) do
@@ -135,39 +134,44 @@ function menu(parent, t)
                                                                      self.o.sub[self.menuid][self.submenuid]:flip()
                                                                   end,
                                                                   "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )
-               else
-                  v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                     tbl.callback()
-                                                                  end,
-                                                                  "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
                end
-            else
-
-               v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                  self.status[self.menuid][voiceid]   =  not self.status[self.menuid][voiceid]
-                                                               end,
-                                                               "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
             end
 
-            -- ------------------------------
+            if type(tbl.callback)   == 'table'  then
+               v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
+                                                                  print("PIPPARELLABELLA")
+                                                                  local func, param, trigger =  unpack(tbl.callback)
+                                                                  print(string.format("fun=%s param=%s, trigger", func, param, trigger))
+                                                                  func(param)
+                                                                  if trigger and trigger == "close" then self:flip() end
+                                                               end,
+                                                               "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
+            end
+         else
+            v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
+                                                               self.status[self.menuid][voiceid]   =  not self.status[self.menuid][voiceid]
+                                                            end,
+                                                            "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
+         end
 
-            -- highligth menu voice on mousover
-            v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
-            v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(self.color.black)) end, "__mouse: highlight voice menu OFF")
+         -- ------------------------------
 
-            local fb =  {}
-            fb.left, fb.top, fb.right, fb.bottom  =  self.o.menu:GetBounds()
-            local vb =  {}
-            vb.left, vb.top, vb.right, vb.bottom  =  v:GetBounds()
+         -- highligth menu voice on mousover
+         v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
+         v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(self.color.black)) end, "__mouse: highlight voice menu OFF")
 
-            local fw =  fb.right - fb.left
-            local vw =  vb.right - vb.left
-            if vw > fw then self.o.menu:SetWidth(vw)  end
+         local fb =  {}
+         fb.left, fb.top, fb.right, fb.bottom  =  self.o.menu:GetBounds()
+         local vb =  {}
+         vb.left, vb.top, vb.right, vb.bottom  =  v:GetBounds()
 
-            if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
-            self.o.voices[self.menuid][voiceid] =  v
-            lastvoiceframe                      =  v
---          end
+         local fw =  fb.right - fb.left
+         local vw =  vb.right - vb.left
+         if vw > fw then self.o.menu:SetWidth(vw)  end
+
+         if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
+         self.o.voices[self.menuid][voiceid] =  v
+         lastvoiceframe                      =  v
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
