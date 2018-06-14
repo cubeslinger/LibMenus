@@ -4,7 +4,7 @@
 -- StartDate   30/05/2018
 --
 function menu(parent, t)
-   print("--- ENTERING MENU() ---")
+--    print("--- ENTERING MENU() ---")
    -- the new instance
    local self =   {
                   menuid      =  0,
@@ -78,15 +78,15 @@ function menu(parent, t)
 
       for _, tbl in pairs(t.voices) do
 
-         print(string.format("tbl.name=%s, tbl.callback=%s", tbl.name, tbl.callback))
-         if type(tbl.callback) == 'table' then
-            local xx, zz = unpack(tbl.callback)
-            print(string.format("tbl.callback => %s(%s)", xx, zz))
-         end
+--          print(string.format("tbl.name=%s, tbl.callback=%s", tbl.name, tbl.callback))
+--          if type(tbl.callback) == 'table' then
+--             local xx, zz = unpack(tbl.callback)
+--             print(string.format("tbl.callback => %s(%s)", xx, zz))
+--          end
 
          voiceid  =  voiceid + 1
 
-         print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
+--          print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
 
          if not next(self.status[self.menuid])           and
             self.status[self.menuid][voiceid]   == nil   then
@@ -117,20 +117,20 @@ function menu(parent, t)
 
                   self.submenuid  =  self.submenuid  + 1
 
-                  print("-> ££ CALLING MENU() ££")
+--                   print("-> ££ CALLING MENU() ££")
 
                   --                   local tt = new(v, tbl.submenu, self)
                   local tt = menu(v, tbl.submenu)
-                  local a, b = nil, nil
-                  for a, b in pairs(tt) do
-                     print(string.format("      NEW: a=%s, b=%s",  a, b))
-                  end
+--                   local a, b = nil, nil
+--                   for a, b in pairs(tt) do
+--                      print(string.format("      NEW: a=%s, b=%s",  a, b))
+--                   end
 
                   if self.o.sub              == nil   then self.o.sub               =  {} end
                   if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
                   self.o.sub[self.menuid][self.submenuid]                           =  tt
 
-                  print("<- ££ CALLING MENU() ££")
+--                   print("<- ££ CALLING MENU() ££")
 
                   v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                      self.o.sub[self.menuid][self.submenuid]:flip()
@@ -141,9 +141,9 @@ function menu(parent, t)
 
             if type(tbl.callback)   == 'table'  then
                v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                  print("PIPPARELLABELLA")
+--                                                                   print("PIPPARELLABELLA")
                                                                   local func, param, trigger =  unpack(tbl.callback)
-                                                                  print(string.format("fun=%s param=%s, trigger", func, param, trigger))
+--                                                                   print(string.format("fun=%s param=%s, trigger", func, param, trigger))
                                                                   func(param)
                                                                   if trigger and trigger == "close" then self:flip() end
                                                                end,
@@ -194,6 +194,6 @@ function menu(parent, t)
    end
 
    -- return the class instance
-   print("&& RETURNING MENU() &&")
+--    print("&& RETURNING MENU() &&")
    return self
 end
