@@ -11,11 +11,12 @@ function menu(parent, t)
                   submenuid   =  0,
                   o           =  {},
                   fontsize    =  12,
-                  color       =  {  black  = {  0,   0,   0,   1},
-                                    grey   = { .5,  .5,  .5,   1},
-                                    yellow = { .8,  .8,   0,   1},
-                                    red    = {  1,   0,   0,   1},
-                                    green  = {  0,   1,   0,   1},
+                  color       =  {  black       =  {  0,   0,   0,   1  },
+                                    grey        =  { .5,  .5,  .5,   1  },
+                                    yellow      =  { .8,  .8,   0,   1  },
+                                    red         =  {  1,   0,   0,   1  },
+                                    green       =  {  0,   1,   0,   1  },
+                                    deepblack   =  {  0,   0,   0,   1  },
                                  },
                   borders     =  { l=2, r=2, t=2, b=2 },               -- Left, Right, Top, Bottom
                   status      =  {},
@@ -31,9 +32,9 @@ function menu(parent, t)
       return floor(num * mult + .5) / mult
    end
 
-   function self.show() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
-   function self.hide() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-   function self.flip() if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
+   function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
+   function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
+   function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
    function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end   end
    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end   end
 
@@ -58,7 +59,8 @@ function menu(parent, t)
 
       -- Main Window
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
-      self.o.menu:SetBackgroundColor(unpack(self.color.black))
+--       self.o.menu:SetBackgroundColor(unpack(self.color.black))
+      self.o.menu:SetBackgroundColor(unpack(self.color.deepblack))
       self.o.menu:SetWidth(self.basewidth)
 
       if parent ~= nil and next(parent) then
