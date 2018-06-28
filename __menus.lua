@@ -18,7 +18,7 @@ function menu(parent, t)
                                     green       =  {  0,   1,   0,   1  },
                                     deepblack   =  {  0,   0,   0,   1  },
                                  },
-                  borders     =  { l=2, r=2, t=2, b=2 },               -- Left, Right, Top, Bottom
+                  borders     =  { l=4, r=4, t=4, b=4 },               -- Left, Right, Top, Bottom
                   status      =  {},
                   maxwidth    =  0,
                   maxlen      =  0,
@@ -44,8 +44,9 @@ function menu(parent, t)
       -- t  =  {  fontsize=[],                        -- defaults to
       --          fontface=[],                        -- defaults to Rift Font
       --          voices=< {
-      --                      { name="<voice1_name>", [callback="function()||'_submenu_'], [submenu={}] },
-      --                      { name="<voice2_name>", [callback="function()||'_submenu_'], [submenu={}] },
+--       --                      { name="<voice1_name>", [callback={ <function>, <function_params> [,'close'] } }
+      --                      { name="<voice1_name>", [callback={ <function>, <function_params> } }
+      --                      { name="<voice2_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
       --                      { ... },
       --                   } >,
       --       }
@@ -59,9 +60,9 @@ function menu(parent, t)
 
       -- Main Window
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
---       self.o.menu:SetBackgroundColor(unpack(self.color.black))
       self.o.menu:SetBackgroundColor(unpack(self.color.deepblack))
       self.o.menu:SetWidth(self.basewidth)
+      self.o.menu:SetLayer(998)
 
       if parent ~= nil and next(parent) then
          self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT")
@@ -80,15 +81,7 @@ function menu(parent, t)
 
       for _, tbl in pairs(t.voices) do
 
---          print(string.format("tbl.name=%s, tbl.callback=%s", tbl.name, tbl.callback))
---          if type(tbl.callback) == 'table' then
---             local xx, zz = unpack(tbl.callback)
---             print(string.format("tbl.callback => %s(%s)", xx, zz))
---          end
-
          voiceid  =  voiceid + 1
-
---          print(string.format("  __menu: (m=%s, s=%s, v=%s) processing VOICE: %s",  self.menuid, self.submenuid, voiceid, tbl.name))
 
          if not next(self.status[self.menuid])           and
             self.status[self.menuid][voiceid]   == nil   then
@@ -99,19 +92,17 @@ function menu(parent, t)
          v:SetFontSize(fs)
          v:SetText(tbl.name)
          v:SetBackgroundColor(unpack(self.color.black))
-         v:SetLayer(12)
+         v:SetLayer(999)
 
          if voiceid == 1 then
             -- first voice attaches to framecontainer
-            v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT")
-            v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT")
+            v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
+            v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
          else
             -- other voices attach to last one
             v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
             v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
          end
-
-         -- ------------------------------
 
          if tbl.callback ~= nil then
             if type(tbl.callback) == 'string' then
@@ -119,20 +110,11 @@ function menu(parent, t)
 
                   self.submenuid  =  self.submenuid  + 1
 
---                   print("-> ££ CALLING MENU() ££")
-
-                  --                   local tt = new(v, tbl.submenu, self)
                   local tt = menu(v, tbl.submenu)
---                   local a, b = nil, nil
---                   for a, b in pairs(tt) do
---                      print(string.format("      NEW: a=%s, b=%s",  a, b))
---                   end
-
                   if self.o.sub              == nil   then self.o.sub               =  {} end
                   if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
                   self.o.sub[self.menuid][self.submenuid]                           =  tt
 
---                   print("<- ££ CALLING MENU() ££")
 
                   v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                      self.o.sub[self.menuid][self.submenuid]:flip()
@@ -143,11 +125,9 @@ function menu(parent, t)
 
             if type(tbl.callback)   == 'table'  then
                v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
---                                                                   print("PIPPARELLABELLA")
                                                                   local func, param, trigger =  unpack(tbl.callback)
---                                                                   print(string.format("fun=%s param=%s, trigger", func, param, trigger))
                                                                   func(param)
-                                                                  if trigger and trigger == "close" then self:flip() end
+--                                                                   if trigger and trigger == "close" then self:flip() end
                                                                end,
                                                                "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
             end
@@ -157,8 +137,6 @@ function menu(parent, t)
                                                             end,
                                                             "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
          end
-
-         -- ------------------------------
 
          -- highligth menu voice on mousover
          v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
@@ -196,6 +174,5 @@ function menu(parent, t)
    end
 
    -- return the class instance
---    print("&& RETURNING MENU() &&")
    return self
 end
