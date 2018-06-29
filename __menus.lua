@@ -22,7 +22,8 @@ function menu(parent, t)
                   status      =  {},
                   maxwidth    =  0,
                   maxlen      =  0,
-                  basewidth   =  100
+                  basewidth   =  100,
+                  initialized =  false
                   }
 
    local function round(num, digits)
@@ -40,6 +41,16 @@ function menu(parent, t)
 
 
    local function new(parent, t, oldself)
+      
+      local pleft, ptop, pright, pbottom  =  nil, nil, nil, nil 
+
+      -- Get Parent Coordinates
+      if parent ~= nil and next(parent) ~= nil then
+         
+         pleft, ptop, pright, pbottom = parent:GetBounds()
+         
+      end
+          
       --
       -- t  =  {  fontsize=[],                        -- defaults to
       --          fontface=[],                        -- defaults to Rift Font
@@ -57,24 +68,32 @@ function menu(parent, t)
       self.menuid    =  (self.menuid + 1)
       local fs       =  t.fontsize or self.fontsize
       if self.status[self.menuid]   == nil   then  self.status[self.menuid]   =  {} end
+                                                      
+      --Global context (parent frame-thing).
+      self.o.context  = UI.CreateContext("mano_input_context")  
+      self.o.context:SetStrata("topmost") 
 
       -- Main Window
-      self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
+--       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
+      self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
       self.o.menu:SetBackgroundColor(unpack(self.color.deepblack))
       self.o.menu:SetWidth(self.basewidth)
-      self.o.menu:SetLayer(998)
+      self.o.menu:SetLayer(50)
 
-      if parent ~= nil and next(parent) then
-         self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT")
-      else
-         if t.x ~= nil and t.y ~= nil then
-            -- we have coordinates
-            self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", t.x, t.y)
-         else
-            print(string.format("ERROR: __menu.lua: parent is %s, and (%s,%s)", parent, x, y))
-            return {}
-         end
-      end
+--       if parent ~= nil and next(parent) then
+--          self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT")
+--       else
+--          if t.x ~= nil and t.y ~= nil then
+--             -- we have coordinates
+--             self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", t.x, t.y)
+--          else
+--             print(string.format("ERROR: __menu.lua: parent is %s, and (%s,%s)", parent, x, y))
+--             return {}
+--          end
+--       end
+                                                      
+--       self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", parentx, parenty)                                                      
+      self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", pleft, pbottom)
 
       local voiceid        =  0
       local lastvoiceframe =  self.o.menu
@@ -92,7 +111,7 @@ function menu(parent, t)
          v:SetFontSize(fs)
          v:SetText(tbl.name)
          v:SetBackgroundColor(unpack(self.color.black))
-         v:SetLayer(999)
+         v:SetLayer(100)
 
          if voiceid == 1 then
             -- first voice attaches to framecontainer
@@ -157,7 +176,7 @@ function menu(parent, t)
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
-      self.o.menu:SetHeight(h)
+      self.o.menu:SetHeight(h + self.borders.t + self.borders.b)
       local w = lastvoiceframe:GetRight() - lastvoiceframe:GetLeft()
       self.o.menu:SetWidth(math.max(self.o.menu:GetWidth(), w))
 
@@ -167,12 +186,15 @@ function menu(parent, t)
    end
 
    -- Initialize
-   if parent ~= nil  and next(parent) ~= nil and
-      t      ~= nil  and next(t)      ~= nil then
+   if not self.initialized then
+      if parent ~= nil  and next(parent) ~= nil and
+         t      ~= nil  and next(t)      ~= nil then
 
-      self  =  new(parent, t)
+         self  =  new(parent, t)
+         self.initialized  =  true
+      end
    end
-
+                                                      
    -- return the class instance
    return self
 end
