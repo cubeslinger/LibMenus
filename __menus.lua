@@ -4,7 +4,6 @@
 -- StartDate   30/05/2018
 --
 function menu(parent, t)
---    print("--- ENTERING MENU() ---")
    -- the new instance
    local self =   {
                   menuid      =  0,
@@ -40,28 +39,23 @@ function menu(parent, t)
    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end   end
 
 
+      
+   --
+   -- t  =  {  fontsize=[],                        -- defaults to
+   --          fontface=[],                        -- defaults to Rift Font
+   --          voices=< {
+   --                      { name="<voice1_name>", [callback={ <function>, <function_params> [,'close'] } }
+   --                      { name="<voice1_name>", [callback={ <function>, <function_params> } }
+   --                      { name="<voice2_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
+   --                      { ... },
+   --                   } >,
+   --       }
+   --      
    local function new(parent, t, oldself)
       
-      local pleft, ptop, pright, pbottom  =  nil, nil, nil, nil 
-
-      -- Get Parent Coordinates
-      if parent ~= nil and next(parent) ~= nil then
-         
-         pleft, ptop, pright, pbottom = parent:GetBounds()
-         
-      end
+      -- Is Parent a valid one?
+      if parent == nil or next(parent) == nil then parent   =  UIParent end
           
-      --
-      -- t  =  {  fontsize=[],                        -- defaults to
-      --          fontface=[],                        -- defaults to Rift Font
-      --          voices=< {
---       --                      { name="<voice1_name>", [callback={ <function>, <function_params> [,'close'] } }
-      --                      { name="<voice1_name>", [callback={ <function>, <function_params> } }
-      --                      { name="<voice2_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
-      --                      { ... },
-      --                   } >,
-      --       }
-      --
       if oldself then self =  oldself  end
 
       self.o.voices  =  {}
@@ -74,26 +68,11 @@ function menu(parent, t)
       self.o.context:SetStrata("topmost") 
 
       -- Main Window
---       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), parent)
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
       self.o.menu:SetBackgroundColor(unpack(self.color.deepblack))
       self.o.menu:SetWidth(self.basewidth)
       self.o.menu:SetLayer(50)
-
---       if parent ~= nil and next(parent) then
---          self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT")
---       else
---          if t.x ~= nil and t.y ~= nil then
---             -- we have coordinates
---             self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", t.x, t.y)
---          else
---             print(string.format("ERROR: __menu.lua: parent is %s, and (%s,%s)", parent, x, y))
---             return {}
---          end
---       end
-                                                      
---       self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", parentx, parenty)                                                      
-      self.o.menu:SetPoint("TOPLEFT", UIParent, "TOPLEFT", pleft, pbottom)
+      self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT")
 
       local voiceid        =  0
       local lastvoiceframe =  self.o.menu
