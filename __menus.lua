@@ -16,6 +16,7 @@ function menu(parent, t)
                                     red         =  {  1,   0,   0,   1  },
                                     green       =  {  0,   1,   0,   1  },
                                     deepblack   =  {  0,   0,   0,   1  },
+                                    white       =  {  1,   1,   1,   1  },
                                  },
                   borders     =  { l=4, r=4, t=4, b=4 },               -- Left, Right, Top, Bottom
                   status      =  {},
@@ -24,6 +25,23 @@ function menu(parent, t)
                   basewidth   =  100,
                   initialized =  false
                   }
+
+
+   local function dumptable(o)
+      if type(o) == 'table' then
+         local s = '{ '
+            for k,v in pairs(o) do
+               if type(k) ~= 'number' then
+                  k = '"'..k..'"'
+               end
+               s =   s ..'['..k..'] = ' ..(dumptable(v) or "nil table").. ',\n'
+            end
+            return s .. '} '
+      else
+         return tostring(o)
+      end
+   end
+
 
    local function round(num, digits)
       local floor = math.floor
@@ -34,38 +52,50 @@ function menu(parent, t)
 
    function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
    function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-   function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
+--    function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
+
+
+   function self.flip()
+      if self.o.menu ~= nil and next(self.o.menu) then
+         local state =  not self.o.menu:GetVisible()
+         for obj, _ in pairs(self.o.menu:GetChildren()) do
+            print("obj:\n", dumptable(obj))
+            obj:SetVisible(state)
+         end
+      end
+      return
+   end
+
+
    function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end   end
    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end   end
 
-
-      
    --
    -- t  =  {  fontsize=[],                        -- defaults to
    --          fontface=[],                        -- defaults to Rift Font
    --          voices=< {
-   --                      { name="<voice1_name>", [callback={ <function>, <function_params> [,'close'] } }
-   --                      { name="<voice1_name>", [callback={ <function>, <function_params> } }
-   --                      { name="<voice2_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
+   --                      { name="<voice1_name>", [callback={ <function>, <function_params> }, [icon="iconname.png.dds"]}
+   --                      { name="<voice2_name>", [callback={ <function>, <function_params> }, [icon="iconname.png.dds"] }
+   --                      { name="<voice3_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
    --                      { ... },
    --                   } >,
    --       }
-   --      
+   --
    local function new(parent, t, oldself)
-      
+
       -- Is Parent a valid one?
       if parent == nil or next(parent) == nil then parent   =  UIParent end
-          
+
       if oldself then self =  oldself  end
 
       self.o.voices  =  {}
       self.menuid    =  (self.menuid + 1)
       local fs       =  t.fontsize or self.fontsize
       if self.status[self.menuid]   == nil   then  self.status[self.menuid]   =  {} end
-                                                      
+
       --Global context (parent frame-thing).
-      self.o.context  = UI.CreateContext("mano_input_context")  
-      self.o.context:SetStrata("topmost") 
+      self.o.context  = UI.CreateContext("mano_input_context")
+      self.o.context:SetStrata("topmost")
 
       -- Main Window
       self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
@@ -81,9 +111,77 @@ function menu(parent, t)
 
          voiceid  =  voiceid + 1
 
-         if not next(self.status[self.menuid])           and
+         if not next(self.status[self.menuid])  and
             self.status[self.menuid][voiceid]   == nil   then
             self.status[self.menuid][voiceid]   =  false
+         end
+
+
+--          local icon  =  {}
+--          if tbl.icon ~= nil then
+--             icon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. voiceid .. "_icon", lastvoiceframe)
+--             icon:SetTexture("Rift", tbl.icon)
+--             icon:SetHeight(fs * 1.5)
+--             icon:SetWidth(fs * 1.5)
+--             icon:SetLayer(100)
+--             icon:SetBackgroundColor(unpack(self.color.black))
+--
+--             if voiceid == 1 then
+--                -- first voice attaches to framecontainer with border spaces
+--                icon:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
+--             else
+--                -- other voices attach to last one
+--                icon:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
+--             end
+--
+--          end
+--
+--          local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
+--          v:SetFontSize(fs)
+--          v:SetText(tbl.name)
+--          v:SetBackgroundColor(unpack(self.color.black))
+--          v:SetLayer(100)
+--
+--          if tbl.icon ~= nil then
+--             v:SetPoint("TOPLEFT",   icon, "TOPRIGHT", self.borders.l, 0)
+--             if voiceid == 1 then
+--                v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, 0)
+--             else
+--                v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+--             end
+--          else
+--             if voiceid == 1 then
+--                -- first voice attaches to framecontainer with border spaces
+--                v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
+--                v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
+--             else
+--                -- other voices attach to last one
+--                v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
+--                v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+--             end
+--          end
+
+         local container    =  UI.CreateFrame("Frame", "menu_container_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
+         container:SetLayer(90)
+         if voiceid == 1 then
+            -- first voice attaches to framecontainer with border spaces
+            container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
+            container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
+         else
+            -- other voices attach to last one
+            container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
+            container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+         end
+
+         local icon  =  {}
+         if tbl.icon ~= nil then
+            icon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. voiceid .. "_icon", lastvoiceframe)
+            icon:SetTexture("Rift", tbl.icon)
+            icon:SetHeight(fs * 1.5)
+            icon:SetWidth(fs * 1.5)
+            icon:SetLayer(100)
+            icon:SetBackgroundColor(unpack(self.color.black))
+            icon:SetPoint("TOPLEFT",   container, "TOPLEFT", self.borders.l, self.borders.t)
          end
 
          local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
@@ -92,14 +190,12 @@ function menu(parent, t)
          v:SetBackgroundColor(unpack(self.color.black))
          v:SetLayer(100)
 
-         if voiceid == 1 then
-            -- first voice attaches to framecontainer
-            v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
-            v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
+         if tbl.icon ~= nil then
+            v:SetPoint("TOPLEFT",   icon, "TOPRIGHT", self.borders.l, 0)
+            v:SetPoint("TOPRIGHT",  container, "TOPRIGHT")
          else
-            -- other voices attach to last one
-            v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
-            v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+            v:SetPoint("TOPLEFT",   container, "TOPLEFT", self.borders.l, self.borders.t)
+            v:SetPoint("TOPRIGHT",  container, "TOPRIGHT", -self.borders.r, self.borders.t)
          end
 
          if tbl.callback ~= nil then
@@ -125,7 +221,6 @@ function menu(parent, t)
                v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
                                                                   local func, param, trigger =  unpack(tbl.callback)
                                                                   func(param)
---                                                                   if trigger and trigger == "close" then self:flip() end
                                                                end,
                                                                "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
             end
@@ -150,8 +245,11 @@ function menu(parent, t)
          if vw > fw then self.o.menu:SetWidth(vw)  end
 
          if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
-         self.o.voices[self.menuid][voiceid] =  v
-         lastvoiceframe                      =  v
+--          self.o.voices[self.menuid][voiceid] =  v
+--          lastvoiceframe                      =  v
+         self.o.voices[self.menuid][voiceid] =  container
+         lastvoiceframe                      =  container
+
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
@@ -173,7 +271,7 @@ function menu(parent, t)
          self.initialized  =  true
       end
    end
-                                                      
+
    -- return the class instance
    return self
 end
