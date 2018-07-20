@@ -13,6 +13,7 @@ function menu(parent, t)
                   color       =  {  black       =  {  0,   0,   0,   1  },
                                     grey        =  { .5,  .5,  .5,   1  },
                                     yellow      =  { .8,  .8,   0,   1  },
+                                    green       =  {  0,  .8,   0,   1  },
                                     red         =  {  1,   0,   0,   1  },
                                     green       =  {  0,   1,   0,   1  },
                                     deepblack   =  {  0,   0,   0,   1  },
@@ -20,9 +21,9 @@ function menu(parent, t)
                                  },
                   borders     =  { l=4, r=4, t=4, b=4 },               -- Left, Right, Top, Bottom
                   status      =  {},
-                  maxwidth    =  0,
                   maxlen      =  0,
                   basewidth   =  100,
+                  maxwidth    =  100,
                   initialized =  false
                   }
 
@@ -52,21 +53,7 @@ function menu(parent, t)
 
    function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
    function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
---    function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
-
-
-   function self.flip()
-      if self.o.menu ~= nil and next(self.o.menu) then
-         local state =  not self.o.menu:GetVisible()
-         for obj, _ in pairs(self.o.menu:GetChildren()) do
-            print("obj:\n", dumptable(obj))
-            obj:SetVisible(state)
-         end
-      end
-      return
-   end
-
-
+   function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
    function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end   end
    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end   end
 
@@ -116,61 +103,19 @@ function menu(parent, t)
             self.status[self.menuid][voiceid]   =  false
          end
 
-
---          local icon  =  {}
---          if tbl.icon ~= nil then
---             icon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. voiceid .. "_icon", lastvoiceframe)
---             icon:SetTexture("Rift", tbl.icon)
---             icon:SetHeight(fs * 1.5)
---             icon:SetWidth(fs * 1.5)
---             icon:SetLayer(100)
---             icon:SetBackgroundColor(unpack(self.color.black))
---
---             if voiceid == 1 then
---                -- first voice attaches to framecontainer with border spaces
---                icon:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
---             else
---                -- other voices attach to last one
---                icon:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
---             end
---
---          end
---
---          local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
---          v:SetFontSize(fs)
---          v:SetText(tbl.name)
---          v:SetBackgroundColor(unpack(self.color.black))
---          v:SetLayer(100)
---
---          if tbl.icon ~= nil then
---             v:SetPoint("TOPLEFT",   icon, "TOPRIGHT", self.borders.l, 0)
---             if voiceid == 1 then
---                v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, 0)
---             else
---                v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
---             end
---          else
---             if voiceid == 1 then
---                -- first voice attaches to framecontainer with border spaces
---                v:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
---                v:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
---             else
---                -- other voices attach to last one
---                v:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
---                v:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
---             end
---          end
-
-         local container    =  UI.CreateFrame("Frame", "menu_container_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
+         local container    =  UI.CreateFrame("Frame", "menu_container_" .. self.menuid .. "_" .. parent:GetName(), lastvoiceframe)
          container:SetLayer(90)
+         container:SetBackgroundColor(unpack(self.color.deepblack))
          if voiceid == 1 then
+            print("container first voice")
             -- first voice attaches to framecontainer with border spaces
-            container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT", self.borders.l, self.borders.t)
-            container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT", -self.borders.r, self.borders.t)
+            container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     self.borders.l, self.borders.t)
+            container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -self.borders.r, self.borders.t)
          else
+            print("container NOT first voice")
             -- other voices attach to last one
-            container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
-            container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
+            container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, self.borders.t)
+            container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, self.borders.t)
          end
 
          local icon  =  {}
@@ -181,7 +126,8 @@ function menu(parent, t)
             icon:SetWidth(fs * 1.5)
             icon:SetLayer(100)
             icon:SetBackgroundColor(unpack(self.color.black))
-            icon:SetPoint("TOPLEFT",   container, "TOPLEFT", self.borders.l, self.borders.t)
+            icon:SetPoint("TOPLEFT",      container, "TOPLEFT")
+            if self.maxwidth < icon:GetWidth() then self.maxwidth  =  icon:GetWidth()  end
          end
 
          local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. voiceid, lastvoiceframe)
@@ -191,11 +137,17 @@ function menu(parent, t)
          v:SetLayer(100)
 
          if tbl.icon ~= nil then
-            v:SetPoint("TOPLEFT",   icon, "TOPRIGHT", self.borders.l, 0)
-            v:SetPoint("TOPRIGHT",  container, "TOPRIGHT")
+            v:SetPoint("TOPLEFT",   icon,       "TOPRIGHT", self.borders.l, 0)
+            v:SetPoint("RIGHT",     container,  "RIGHT")
+
+            local w  =  icon:GetWidth() + v:GetWidth() + self.borders.l
+            if self.maxwidth < w then self.maxwidth  =  w end
          else
-            v:SetPoint("TOPLEFT",   container, "TOPLEFT", self.borders.l, self.borders.t)
-            v:SetPoint("TOPRIGHT",  container, "TOPRIGHT", -self.borders.r, self.borders.t)
+            v:SetPoint("TOPLEFT",   container, "TOPLEFT")
+            v:SetPoint("TOPRIGHT",  container, "TOPRIGHT")
+
+            local w  =  v:GetWidth()
+            if self.maxwidth < w then self.maxwidth  =  w end
          end
 
          if tbl.callback ~= nil then
@@ -235,28 +187,20 @@ function menu(parent, t)
          v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(self.color.grey))  end, "__mouse: highlight voice menu ON")
          v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(self.color.black)) end, "__mouse: highlight voice menu OFF")
 
-         local fb =  {}
-         fb.left, fb.top, fb.right, fb.bottom  =  self.o.menu:GetBounds()
-         local vb =  {}
-         vb.left, vb.top, vb.right, vb.bottom  =  v:GetBounds()
-
-         local fw =  fb.right - fb.left
-         local vw =  vb.right - vb.left
-         if vw > fw then self.o.menu:SetWidth(vw)  end
+         if icon ~= nil and next(icon) then  container:SetHeight(icon:GetHeight())
+         else                                container:SetHeight(v:GetHeight())
+         end
 
          if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
---          self.o.voices[self.menuid][voiceid] =  v
---          lastvoiceframe                      =  v
          self.o.voices[self.menuid][voiceid] =  container
          lastvoiceframe                      =  container
 
+         lastvoiceframe:SetWidth(self.maxwidth)
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
       self.o.menu:SetHeight(h + self.borders.t + self.borders.b)
-      local w = lastvoiceframe:GetRight() - lastvoiceframe:GetLeft()
-      self.o.menu:SetWidth(math.max(self.o.menu:GetWidth(), w))
-
+      self.o.menu:SetWidth(self.maxwidth + self.borders.l + self.borders.r)
       self.o.menu:SetVisible(false)
 
       return self
