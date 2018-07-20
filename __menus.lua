@@ -94,7 +94,18 @@ function menu(parent, t)
       local voiceid        =  0
       local lastvoiceframe =  self.o.menu
 
+--       print("-------------------------------------------------")
+--       print("t.voices is nil:\n", dumptable(t.voices)) print("\n")
+--       print("-------------------------------------------------")
+
       for _, tbl in pairs(t.voices) do
+
+         if tbl["name"] == nil then goto continue
+         else                    print("tbl.name is nil:\n", dumptable(tbl)) print("\n")
+         end
+
+         print(string.format("\nNAME: %s", tbl.name))
+         print(string.format("CALL: %s\n", tbl.callback))
 
          voiceid  =  voiceid + 1
 
@@ -107,12 +118,12 @@ function menu(parent, t)
          container:SetLayer(90)
          container:SetBackgroundColor(unpack(self.color.deepblack))
          if voiceid == 1 then
-            print("container first voice")
+--             print("container first voice")
             -- first voice attaches to framecontainer with border spaces
             container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     self.borders.l, self.borders.t)
             container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -self.borders.r, self.borders.t)
          else
-            print("container NOT first voice")
+--             print("container NOT first voice")
             -- other voices attach to last one
             container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, self.borders.t)
             container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, self.borders.t)
@@ -196,6 +207,9 @@ function menu(parent, t)
          lastvoiceframe                      =  container
 
          lastvoiceframe:SetWidth(self.maxwidth)
+
+         ::continue::
+
       end
 
       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
