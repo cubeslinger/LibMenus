@@ -101,7 +101,7 @@ function menu(parent, t)
       for _, tbl in pairs(t.voices) do
 
          if tbl["name"] == nil then goto continue
-         else                    print("tbl.name is nil:\n", dumptable(tbl)) print("\n")
+--          else                    print("tbl.name is nil:\n", dumptable(tbl)) print("\n")
          end
 
          print(string.format("\nNAME: %s", tbl.name))
