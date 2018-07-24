@@ -10,5 +10,7 @@ Environment =  "4.0"
 
 
 RunOnStartup = {
+   "__menus_init.lua",
+   "__menus_voices.lua",
    "__menus.lua",
 }
