@@ -10,19 +10,21 @@
 --
 local addon, __menus = ...
 
-function __createvoice(parent, t)
+function __createvoices(parent, t)
    -- the new instance
    local self =   {
                   initialized =  false
                   voices      =  {}
                   maxwidth    =  0
                   voiceid     =  0
+                  submenu     =  {}
                   }
 
 
 
    local function createobjs(parent, t)
 
+      local width =  0
       local o     =  {}
       o.container =  nil
       o.icon      =  nil
@@ -36,8 +38,6 @@ function __createvoice(parent, t)
       o.container:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.container:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
       o.container:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.container:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
 
-
-
       if t.icon   ~= nil   then
          o.icon  =  UI.CreateFrame("Texture", "voice_" .. self.voiceid .. "_icon", parent)                     -- Voice Icon
          o.icon:SetTexture("Rift", tbl.icon)
@@ -45,6 +45,7 @@ function __createvoice(parent, t)
          o.icon:SetWidth(fs * 1.5)
          o.icon:SetLayer(100)
          o.icon:SetBackgroundColor(unpack(__menus.color.black))
+         width  =  width + o.icon:GetWidth() + __menus.borders.l
       end
 
       o.text	=  UI.CreateFrame("Text", "voice_" .. self.voiceid .. "_text", parent)                       -- Voice Text
@@ -52,25 +53,37 @@ function __createvoice(parent, t)
       o.text:SetText(tbl.name)
       o.text:SetBackgroundColor(unpack(__menus.color.black))
       o.text:SetLayer(100)
+      width  =  width + o.text:GetWidth()
 
-
-      if type(tbl.callback) == 'string' and tbl.callback == "_submenu_" then
+      if type(t.callback) == 'string' and t.callback == "_submenu_" then
          o.smicon  =  UI.CreateFrame("Texture", "voice_" .. self.voiceid .. "_smicon", parent)                 -- Voice Sub-menu Icon
          o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
          o.smicon:SetHeight(fs)
          o.smicon:SetWidth(fs)
          o.smicon:SetLayer(100)
          o.smicon:SetBackgroundColor(unpack(__menus.color.black))
+         width  =  width + o.smicon:GetWidth() + __menus.borders.left
       end
 
+      if t.callback ~= nil then
 
+         -- CALLBACK _SUBMENU_
+         if type(t.callback) == 'string' then and  t.callback == "_submenu_" then
+            self.submenu[t.name]  =  menu(v, t.submenu)
+            o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
+                                 function()   self.submenu[t.name]:flip() end,
+                                 "__menu: submenu " .. t.name )
+         end
 
+         -- CALLBACK FUNCTION
+         if type(tbl.callback)   == 'table'  then
+            o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
+                                 function()  local func, param, trigger =  unpack(tbl.callback) func(param) end,
+                                 "__menu: callback" .. t.name )
+         end
+      end
 
-
-
-
-
-
+      o.container:SetWidth(width)
 
       return o
    end
@@ -78,135 +91,63 @@ function __createvoice(parent, t)
 
    for _, tbl in pairs(t.voices) do
 
-      self.maxwidth  =  0
+      width  =  0
 
-      if tbl["name"] == nil then goto continue  end
+--       if tbl["name"] == nil then goto continue  end
 
-      --          print(string.format("\nNAME: %s", tbl.name))
-      --          print(string.format("CALL: %s\n", tbl.callback))
+      self.voices   =  createobjs(lastvoiceframe, tbl)
 
-      self.voiceid  =  self.voiceid + 1
+      local w  =  self.voices:GetWidth()
+      if self.maxwidth < w then  self.maxwidth  =  w
 
-      self.voices[self.menuid]   =  createobjs(lastvoiceframe, tbl)
-
---       local container    =  UI.CreateFrame("Frame", "menu_container_" .. self.menuid .. "_" .. "_submenuid_".. (tostring(self.submenuid) or "0") .. parent:GetName(), lastvoiceframe)
---       container:SetLayer(90)
---       container:SetBackgroundColor(unpack(__menus.color.deepblack))
       if voiceid == 1 then
          --             print("container first voice")
          -- first voice attaches to framecontainer with border spaces
-         container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
-         container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
+         self.voices.container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
+         self.voices.container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
       else
          --             print("container NOT first voice")
          -- other voices attach to last one
-         container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
-         container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
+         self.voicescontainer:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
+         self.voicescontainer:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
       end
 
-      local icon  =  {}
-      if tbl.icon ~= nil then
-         icon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid  .. "_submenuid_".. (tostring(self.submenuid) or "0") .. "_voice_" .. voiceid .. "_icon", lastvoiceframe)
-         icon:SetTexture("Rift", tbl.icon)
-         icon:SetHeight(fs * 1.5)
-         icon:SetWidth(fs * 1.5)
-         icon:SetLayer(100)
-         icon:SetBackgroundColor(unpack(__menus.color.black))
-         icon:SetPoint("TOPLEFT",      container, "TOPLEFT")
-         if self.maxwidth < (icon:GetWidth() + __menus.borders.l) then self.maxwidth  =  (icon:GetWidth() + __menus.borders.l)  end
-         print(string.format("    max width: (%s) - %s (icon)", self.maxwidth, tbl.name))
-      end
-
---       local v  =  UI.CreateFrame("Text", "menu_" .. self.menuid  .. "_submenuid_".. (tostring(self.submenuid) or "0") .. "_voice_" .. voiceid, lastvoiceframe)
---       v:SetFontSize(fs)
---       v:SetText(tbl.name)
---       v:SetBackgroundColor(unpack(__menus.color.black))
---       v:SetLayer(100)
-      local w = self.maxwidth + v:GetWidth()
-      if self.maxwidth < w then self.maxwidth  =  w end
-      print(string.format("    max width: (%s) - %s (v)", self.maxwidth, tbl.name))
+      self.voices.icon:SetPoint("TOPLEFT",      self.voices.container, "TOPLEFT")
 
       -- Sub-Menu Icon
       if type(tbl.callback) == 'string' and tbl.callback == "_submenu_" then
-
---          local smicon  =  {}
---          smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid  .. "_submenuid_".. (tostring(self.submenuid) or "0") .. "_voice_" .. voiceid .. "_icon", lastvoiceframe)
---          smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
---          smicon:SetHeight(fs)
---          smicon:SetWidth(fs)
---          smicon:SetLayer(100)
---          smicon:SetBackgroundColor(unpack(__menus.color.black))
-         smicon:SetPoint("CENTERLEFT", v,          "CENTERRIGHT")
-
-         local w = self.maxwidth + smicon:GetWidth() + __menus.borders.l
-         if self.maxwidth < w then self.maxwidth  =  w end
-         print(string.format("    max width: (%s) - %s (smicon)", self.maxwidth, tbl.name))
+         self.voices.smicon:SetPoint("CENTERLEFT", self.voices.text, "CENTERRIGHT")
       end
 
       if tbl.icon ~= nil then
-         v:SetPoint("TOPLEFT",   icon,       "TOPRIGHT", __menus.borders.l, 0)
+         self.voices.text:SetPoint("TOPLEFT",   self.voices.icon, "TOPRIGHT", __menus.borders.l, 0)
       else
-         v:SetPoint("TOPLEFT",   container, "TOPLEFT")
+         self.voices.text:SetPoint("TOPLEFT",   self.voices.container, "TOPLEFT")
       end
 
-      if smicon and next(smicon) then
-         smicon:SetPoint("CENTERLEFT", container,  "CENTERRIGHT")
+      if self.voices.smicon and next(self.voices.smicon) then
+         self.voices.smicon:SetPoint("CENTERLEFT", self.voices.container,  "CENTERRIGHT")
       else
-         v:SetPoint("TOPRIGHT",  container, "TOPRIGHT")
+         self.voices.text:SetPoint("TOPRIGHT",  self.voices.container, "TOPRIGHT")
       end
 
-      if tbl.callback ~= nil then
-         if type(tbl.callback) == 'string' then
-            if tbl.callback == "_submenu_" then
-
-               self.submenuid  =  self.submenuid  + 1
-
-               local tt = new(v, tbl.submenu, {menuid=self.menuid, submenuid=self.submenuid})
-
-               if self.o.sub              == nil   then self.o.sub               =  {} end
-               if self.o.sub[self.menuid] == nil   then self.o.sub[self.menuid]  =  {} end
-
-               self.o.sub[self.menuid][self.submenuid]                           =  tt
-
-               v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                                  self.o.sub[self.menuid][self.submenuid]:flip()
-                                                               end,
-                                                               "__menu: "..self.menuid.."_submenu_"..self.menuid .."_" .. self.submenuid )
-            end
-         end
-
-         if type(tbl.callback)   == 'table'  then
-            v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                               local func, param, trigger =  unpack(tbl.callback)
-                                                               func(param)
-                                                            end,
-                                                            "__menu: "..self.menuid.."_voice_"..voiceid .."_callback" )
-         end
+      if self.voices.icon ~= nil and next(self.voices.icon) then
+         self.voices.container:SetHeight(self.voices.icon:GetHeight())
       else
-         v:EventAttach( Event.UI.Input.Mouse.Left.Click, function()
-                                                            self.status[self.menuid][voiceid]   =  not self.status[self.menuid][voiceid]
-                                                         end,
-                                                         "__menu: "..self.menuid.."_voice_"..voiceid .."_status" )
+         self.voices.container:SetHeight(self.voices.text:GetHeight())
       end
 
-      -- highligth menu voice on mousover
-      v:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() v:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
-      v:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() v:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
-
-      if icon ~= nil and next(icon) then  container:SetHeight(icon:GetHeight())
-      else                                container:SetHeight(v:GetHeight())
-      end
-
-      if self.o.voices[self.menuid] == nil then self.o.voices[self.menuid] =  {} end
-      self.o.voices[self.menuid][voiceid] =  container
-      lastvoiceframe                      =  container
-
-      --          lastvoiceframe:SetWidth(self.maxwidth + __menus.borders.l + __menus.borders.r)
-      --          print(string.format("  max width: (%s) - (lastvoiceframe)", self.maxwidth))
+      lastvoiceframe                      =  self.voices.container
 
       ::continue::
 
    end
 
-   return
+
+   for _, obj in ipairs(self.voicesuid] ~= nil) do  obj:SetWidth(self.maxwidth)   end
+   end
+
+
+
+   return self
 end

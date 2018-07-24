@@ -1,7 +1,7 @@
 Identifier  =  "__menus"
 Name        =  { English = "__menus" }
 NameShort   =  "__menus"
-Version     =  "0.17"
+Version     =  "0.17.2"
 Description =  { English = "Library to build menus" }
 Author      =  "marcob@marcob.org"
 Website     =  "https://github.com/cubeslinger/__menus"
