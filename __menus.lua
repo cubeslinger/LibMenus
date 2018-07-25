@@ -13,6 +13,7 @@ function menu(parent, t)
 --                   submenuid   =  0,
                   o           =  {},
                   fontsize    =  12,
+                  fontface    =  "",
 --                   color       =  {  black       =  {  0,   0,   0,   1  },
 --                                     grey        =  { .5,  .5,  .5,   1  },
 --                                     yellow      =  { .8,  .8,   0,   1  },
@@ -27,9 +28,9 @@ function menu(parent, t)
                   maxlen      =  0,
                   basewidth   =  100,
                   maxwidth    =  0, -- 100
-                  initialized =  false
-                  voices      =  {} -- menu voice objects
-                  submenu     =  {} -- pointers to nested menus (_submenu_)
+                  initialized =  false,
+                  voices      =  {}, -- menu voice objects
+                  submenu     =  {}, -- pointers to nested menus (_submenu_)
                   }
 
 
@@ -112,7 +113,7 @@ function menu(parent, t)
 --       print("t.voices is nil:\n", dumptable(t.voices)) print("\n")
 --       print("-------------------------------------------------")
 
-      self.voices[self.menuid]   =  __createvoices(t.voices)
+      self.voices[self.menuid]   =  __createvoices(self.o.menu, t)
 
 --       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
 --       self.o.menu:SetHeight(h + __menus.borders.t + __menus.borders.b)
