@@ -18,23 +18,29 @@ __menus.color     =  {  black       =  {  0,   0,   0,   1  },
 -- Left, Right, Top, Bottom
 __menus.borders	=  { l=4, r=4, t=4, b=4 }
 
--- local print nested tables
-local function dumptable(o)
-   if type(o) == 'table' then
-      local s = '{ '
-         for k,v in pairs(o) do
-            if type(k) ~= 'number' then
-               k = '"'..k..'"'
+-- local print indented nested tables
+   function dumptable(tbl, indent)
+
+      if not indent then indent = 0 end
+
+      for k, v in pairs(tbl) do
+
+         formatting = string.rep("  ", indent) .. '[' .. k .. ']' .. ": "
+
+         if type(v) == "table" then
+            print(formatting)
+            dumptable(v, indent+1)
+         else
+            if type(v) == "function" then
+               print(formatting .. tostring(v))
+            else
+               print(formatting .. v)
             end
-            s =   s ..'['..k..'] = ' ..(dumptable(v) or "nil table").. ',\n'
          end
-         return s .. '} '
-      else
-         return tostring(o)
       end
    end
 
+
 __menus.f   =  {}
 __menus.f.dumptable  =  dumptable
-
-
+__menus.f.menu       = __menus.menu

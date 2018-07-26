@@ -1,7 +1,7 @@
 Identifier  =  "__menus"
 Name        =  { English = "__menus" }
 NameShort   =  "__menus"
-Version     =  "0.17.3"
+Version     =  "0.17.4"
 Description =  { English = "Library to build menus" }
 Author      =  "marcob@marcob.org"
 Website     =  "https://github.com/cubeslinger/__menus"
@@ -11,6 +11,5 @@ Environment =  "4.0"
 
 RunOnStartup = {
    "__menus_init.lua",
-   "__menus_voices.lua",
    "__menus.lua",
 }

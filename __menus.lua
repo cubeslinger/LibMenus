@@ -34,22 +34,6 @@ function menu(parent, t)
                   }
 
 
-   local function dumptable(o)
-      if type(o) == 'table' then
-         local s = '{ '
-            for k,v in pairs(o) do
-               if type(k) ~= 'number' then
-                  k = '"'..k..'"'
-               end
-               s =   s ..'['..k..'] = ' ..(dumptable(v) or "nil table").. ',\n'
-            end
-            return s .. '} '
-      else
-         return tostring(o)
-      end
-   end
-
-
    local function round(num, digits)
       local floor = math.floor
       local mult = 10^(digits or 0)
@@ -106,33 +90,182 @@ function menu(parent, t)
          self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT")
       end
 
-      local voiceid        =  0
-      local lastvoiceframe =  self.o.menu
-
---       print("-------------------------------------------------")
---       print("t.voices is nil:\n", dumptable(t.voices)) print("\n")
---       print("-------------------------------------------------")
-
-      self.voices[self.menuid]   =  __createvoices(self.o.menu, t)
-
---       local h = lastvoiceframe:GetBottom() - self.o.menu:GetTop()
---       self.o.menu:SetHeight(h + __menus.borders.t + __menus.borders.b)
---       self.o.menu:SetWidth(self.maxwidth + __menus.borders.l + __menus.borders.r)
+      self.voices[self.menuid]   =  self.__createvoices(self.o.menu, t)
 
       self.o.menu:SetVisible(false)
 
---       if self.o.sub and next(self.o.sub) then
---          for _, obj in ipairs(self.o.sub[self.menuid])   do obj:SetVisible(false)   end
---       end
+      return self
+   end
 
---       if self.o.voices[self.menuid] ~= nil then
---          for _, obj in ipairs(self.o.voices[self.menuid] ~= nil) do  obj:SetWidth(self.maxwidth)   end
---       end
+-- ---------------------------------------------------------------------------------------------------------------------------
+   function self.__createvoices(parent, t)
+      -- the new instance
+      local self =   {
+                     fontsize    =  12,
+                     fontface    =  nil,
+                     voices      =  {},
+                     submenu     =  {},
+                     maxwidth    =  0,
+                     voiceid     =  0,
+                     initialized =  false,
+                     }
 
---       print(string.format("MAX WIDTH: (%s)", self.maxwidth))
+      local function createvoiceobjs(parent, t)
+
+   --       print("createobjs:\n", __menus.f.dumptable(t))
+
+         local width =  0
+         local o     =  {}
+         o.container =  nil
+         o.icon      =  nil
+         o.text      =  nil
+         o.smicon    =  nil
+
+         o.container =  UI.CreateFrame("Frame", "voice_" .. self.voiceid .. "_container", parent)                 -- Voice Container
+         o.container:SetLayer(90)
+         o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
+         -- highligth all voice frame on mousover
+         o.container:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.container:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
+         o.container:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.container:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
+
+         if t.icon   ~= nil   then
+            o.icon  =  UI.CreateFrame("Texture", "voice_" .. self.voiceid .. "_icon", parent)                     -- Voice Icon
+            o.icon:SetTexture("Rift", t.icon)
+            o.icon:SetHeight(self.fontsize * 1.5)
+            o.icon:SetWidth(self.fontsize  * 1.5)
+            o.icon:SetLayer(100)
+            o.icon:SetBackgroundColor(unpack(__menus.color.black))
+            width  =  width + o.icon:GetWidth() + __menus.borders.l
+         end
+
+         o.text	=  UI.CreateFrame("Text", "voice_" .. self.voiceid .. "_text", parent)                       -- Voice Text
+         o.text:SetFontSize(self.fontsize)
+         o.text:SetText(t.name)
+         o.text:SetBackgroundColor(unpack(__menus.color.black))
+         o.text:SetLayer(100)
+         width  =  width + o.text:GetWidth()
+
+         if type(t.callback) == 'string' and t.callback == "_submenu_" then
+
+            o.smicon  =  UI.CreateFrame("Texture", "voice_" .. self.voiceid .. "_smicon", parent)                 -- Voice Sub-menu Icon
+            o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
+            o.smicon:SetHeight(self.fontsize)
+            o.smicon:SetWidth(self.fontsize)
+            o.smicon:SetLayer(100)
+            o.smicon:SetBackgroundColor(unpack(__menus.color.black))
+            width  =  width + o.smicon:GetWidth() + __menus.borders.l
+
+         end
+
+         if t.callback ~= nil then
+
+            -- CALLBACK _SUBMENU_
+            if type(t.callback) == 'string' and  t.callback == "_submenu_" then
+
+   --             print("pre submenu:\n", dumptable(t.submenu))
+               print("=============================================")
+   --             self.submenu[t.name]  =  menu(o.text, t.submenu)
+               self.submenu[t.name]  =  menu(o.text, t.submenu)
+   --             print(string.format("self.submenu[%s]:\n", t.name))
+   --             print(dumptable(self.submenu[t.name]))
+               print("--------------------------------------------")
+
+               o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
+                                    function()   self.submenu[t.name]:flip() end,
+                                    "__menu: submenu " .. t.name )
+            end
+
+            -- CALLBACK FUNCTION
+            if type(t.callback)   == 'table'  then
+               o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
+                                    function()  local func, param, trigger =  unpack(t.callback) func(param) end,
+                                    "__menu: callback" .. t.name )
+            end
+         end
+
+   --       o.container:SetWidth(width)
+
+         return o
+      end
+
+      local function main(parent, t)
+
+
+         if t.fontsize  ~= nil then self.fontsize  =  fontsize end
+         if t.fontface  ~= nil then self.fontface  =  fontface end
+
+         lastvoiceframe =  parent
+
+         for _, tbl in pairs(t.voices) do
+
+            width                      =  0
+            self.voiceid               =  self.voiceid + 1
+            self.voices[self.voiceid]  =  createvoiceobjs(lastvoiceframe, tbl)
+
+            if self.voiceid == 1 then
+               -- first voice attaches to framecontainer with border spaces
+               self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
+               self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
+            else
+               -- other voices attach to last one
+               self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
+               self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
+            end
+
+            if self.voices[self.voiceid].icon ~= nil then
+               self.voices[self.voiceid].icon:SetPoint("TOPLEFT",      self.voices[self.voiceid].container, "TOPLEFT")
+            end
+
+            -- Sub-Menu Icon
+            if type(tbl.callback) == 'string' and tbl.callback == "_submenu_" then
+               self.voices[self.voiceid].smicon:SetPoint("CENTERLEFT", self.voices[self.voiceid].text, "CENTERRIGHT")
+            end
+
+            if tbl.icon ~= nil then
+               self.voices[self.voiceid].text:SetPoint("TOPLEFT",   self.voices[self.voiceid].icon, "TOPRIGHT", __menus.borders.l, 0)
+            else
+               self.voices[self.voiceid].text:SetPoint("TOPLEFT",   self.voices[self.voiceid].container, "TOPLEFT")
+            end
+
+            if self.voices[self.voiceid].smicon and next(self.voices[self.voiceid].smicon) then
+               self.voices[self.voiceid].smicon:SetPoint("CENTERLEFT", self.voices[self.voiceid].container,  "CENTERRIGHT")
+            else
+               self.voices[self.voiceid].text:SetPoint("TOPRIGHT",  self.voices[self.voiceid].container, "TOPRIGHT")
+            end
+
+            if self.voices[self.voiceid].icon ~= nil and next(self.voices[self.voiceid].icon) then
+               self.voices[self.voiceid].container:SetHeight(self.voices[self.voiceid].icon:GetHeight())
+            else
+               self.voices[self.voiceid].container:SetHeight(self.voices[self.voiceid].text:GetHeight())
+            end
+
+            lastvoiceframe =  self.voices[self.voiceid].container
+
+            ::continue::
+
+         end
+
+         -- Set Parent Height
+         local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
+         parent:SetHeight(h)
+
+         local idx   =  nil
+         for idx, _ in pairs(self.voices) do
+
+            print(string.format("idx: %s self.voices[%s].text:GetName(): %s", idx, idx, self.voices[idx].text:GetName()))
+
+            self.voices[idx].container:SetWidth(self.maxwidth)
+         end
+
+         return
+      end
+
+      main(parent, t)
 
       return self
    end
+
+-- ---------------------------------------------------------------------------------------------------------------------------
 
    -- Initialize
    if not self.initialized then
