@@ -14,17 +14,6 @@ function menu(parent, menuid, t)
                   o           =  {},
                   fontsize    =  12,
                   fontface    =  "",
---                   color       =  {  black       =  {  0,   0,   0,   1  },
---                                     grey        =  { .5,  .5,  .5,   1  },
---                                     yellow      =  { .8,  .8,   0,   1  },
---                                     green       =  {  0,  .8,   0,   1  },
---                                     red         =  {  1,   0,   0,   1  },
---                                     green       =  {  0,   1,   0,   1  },
---                                     deepblack   =  {  0,   0,   0,   1  },
---                                     white       =  {  1,   1,   1,   1  },
---                                  },
---                   borders     =  { l=4, r=4, t=4, b=4 },               -- Left, Right, Top, Bottom
---                   status      =  {},
                   maxlen      =  0,
                   basewidth   =  100,
                   maxwidth    =  0, -- 100
@@ -97,12 +86,13 @@ function menu(parent, menuid, t)
 				self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 1)
 			end
 
-			self.voices[self.menuid]   =  self.__createvoices(self.o.menu, self.menuid, t)
+			local lastvoiceframe	=	nil
+			self.voices[self.menuid], lastvoiceframe   =  self.__createvoices(self.o.menu, self.menuid, t)
 
 
 -- 		Set Parent Height
---       local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
---       parent:SetHeight(h)
+      local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
+      self.o.menu:SetHeight(h)
 
 		-- Set Width for all menu voices
 --       local idx   =  nil
@@ -160,7 +150,7 @@ function menu(parent, menuid, t)
 
             o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
                                  function()
-												print(string.format("self.submenu[%s][%s]:flip()", menuid, t.name))
+-- 												print(string.format("self.submenu[%s][%s]:flip()", menuid, t.name))
 												__menus.f.dumptable(self.submenu[menuid][t.name])
 												self.submenu[menuid][t.name]:flip()
 											end,
@@ -170,7 +160,7 @@ function menu(parent, menuid, t)
             if type(t.callback)   == 'table'  then
                o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
                                     function()
-													print("menu function callback")
+-- 													print("menu function callback")
 													local func, param, trigger =  unpack(t.callback) func(param)
 												end,
                                     "__menu: callback" .. t.name )
@@ -255,7 +245,7 @@ function menu(parent, menuid, t)
 
       end
 
-      return
+      return self, lastvoiceframe
    end
 
 -- 	self.__createvoices(parent, menuid, t)
