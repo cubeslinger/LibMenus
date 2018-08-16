@@ -75,7 +75,7 @@ function menu(parent, menuid, t)
 			self.o.context:SetStrata("topmost")
 
 			-- Main Window
-			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_" .. parent:GetName(), self.o.context)
+			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "-" .. parent:GetName(), self.o.context)
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
 			self.o.menu:SetLayer((100-1)+menuid)
@@ -86,8 +86,10 @@ function menu(parent, menuid, t)
 				self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 1)
 			end
 
-			local lastvoiceframe	=	nil
-			self.voices[self.menuid], lastvoiceframe   =  self.__createvoices(self.o.menu, self.menuid, t)
+-- 			local lastvoiceframe	=	nil
+-- 			self.voices[self.menuid], lastvoiceframe   =  self._createvoices(self.o.menu, self.menuid, t)
+
+			local _, lastvoiceframe	=	self._createvoices(self.o.menu, self.menuid, t)
 
 
 -- 		Set Parent Height
@@ -104,7 +106,7 @@ function menu(parent, menuid, t)
       return self
    end
 
-   local function createvoiceobjs(parent, menuid, t)
+   local function __createvoiceobjs(parent, menuid, t)
 
 --       local width =  0
       local o     =  {}
@@ -113,12 +115,12 @@ function menu(parent, menuid, t)
       o.text      =  nil
       o.smicon    =  nil
 
-      o.container =  UI.CreateFrame("Frame", "menu_" .. menuid .. "voice_" .. self.voiceid .. "_container", parent)                 -- Voice Container
+      o.container =  UI.CreateFrame("Frame", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_container", parent)                 -- Voice Container
       o.container:SetLayer(100+menuid)
       o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
 
       if t.icon   ~= nil   then
-         o.icon  =  UI.CreateFrame("Texture", "menu_" .. menuid .. "voice_" .. self.voiceid .. "_icon", parent)                     -- Voice Icon
+         o.icon  =  UI.CreateFrame("Texture", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_icon", parent)                     -- Voice Icon
          o.icon:SetTexture("Rift", t.icon)
          o.icon:SetHeight(self.fontsize * 1.5)
          o.icon:SetWidth(self.fontsize  * 1.5)
@@ -127,7 +129,7 @@ function menu(parent, menuid, t)
 --          width  =  width + o.icon:GetWidth() + __menus.borders.l
       end
 
-      o.text	=  UI.CreateFrame("Text", "menu_" .. menuid .. "voice_" .. self.voiceid .. "_text", parent)                       -- Voice Text
+      o.text	=  UI.CreateFrame("Text", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_text", parent)                       -- Voice Text
       o.text:SetFontSize(self.fontsize)
       o.text:SetText(t.name)
       o.text:SetBackgroundColor(unpack(__menus.color.black))
@@ -172,7 +174,7 @@ function menu(parent, menuid, t)
 
       if type(t.callback) == 'string' and t.callback == "_submenu_" then
 
-         o.smicon  =  UI.CreateFrame("Texture", "menu_" .. menuid .. "voice_" .. self.voiceid .. "_smicon", parent)                 -- Voice Sub-menu Icon
+         o.smicon  =  UI.CreateFrame("Texture", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_smicon", parent)                 -- Voice Sub-menu Icon
          o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
          o.smicon:SetHeight(self.fontsize)
          o.smicon:SetWidth(self.fontsize)
@@ -186,7 +188,7 @@ function menu(parent, menuid, t)
    end
 
 --       local function main(parent, menuid, t)
-	function self.__createvoices(parent, menuid, t)
+	function self._createvoices(parent, menuid, t)
 
       if t.fontsize  ~= nil then self.fontsize  =  fontsize end
       if t.fontface  ~= nil then self.fontface  =  fontface end
@@ -197,7 +199,7 @@ function menu(parent, menuid, t)
 
          width                      =  0
          self.voiceid               =  self.voiceid + 1
-         self.voices[self.voiceid]  =  createvoiceobjs(lastvoiceframe, menuid, tbl)
+         self.voices[self.voiceid]  =  __createvoiceobjs(lastvoiceframe, menuid, tbl)
 
 
 -- 			print("(1)")
@@ -247,8 +249,6 @@ function menu(parent, menuid, t)
 
       return self, lastvoiceframe
    end
-
--- 	self.__createvoices(parent, menuid, t)
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 
