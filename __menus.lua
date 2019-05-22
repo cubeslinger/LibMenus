@@ -239,8 +239,8 @@ function menu(parent, menuid, t)
 
 
 -- 		Set Parent Height
-      local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
-      self.o.menu:SetHeight(h)
+         local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
+         self.o.menu:SetHeight(h)
 
 		-- Set Width for all menu voices
 --       local idx   =  nil
