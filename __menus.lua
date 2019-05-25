@@ -241,9 +241,13 @@ function menu(parent, menuid, t)
 
 			local _, lastvoiceframe	=	_createvoices(self.o.menu, self.menuid, t)
 
--- 		Set Parent Height
+			-- Set Parent Height
 			local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
 			self.o.menu:SetHeight(h)
+			-- Set Width for all menu voices
+			--       local idx   =  nil
+			--       for idx, _ in pairs(self.voices) do	self.voices[idx].container:SetWidth(self.maxwidth)	end
+			--
  			self.o.menu:SetVisible(false)
 		end
 
