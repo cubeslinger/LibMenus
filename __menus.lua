@@ -224,7 +224,7 @@ function menu(parent, menuid, t)
 			local fs       =  t.fontsize or self.fontsize
 
 			--Global context (root frame-thing).
-			self.o.context  = UI.CreateContext("mano_input_context")
+			self.o.context  = UI.CreateContext("menu_context_"..self.menuid)
 			self.o.context:SetStrata("topmost")
 
 			-- Main Window
