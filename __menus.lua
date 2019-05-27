@@ -69,7 +69,7 @@ function menu(parent, menuid, t)
 			o.icon  =  UI.CreateFrame("Texture", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_icon", o.container)                     -- Voice Icon
 --          o.icon:SetTexture("Rift", t.icon)
 -- 			o.icon:SetTexture(addon.identifier, t.icon)
-			o.icon:SetTexture(t.iconsource, t.icon)
+			o.icon:SetTexture('Rift', t.icon)
          o.icon:SetHeight(self.fontsize * 1.5)
          o.icon:SetWidth(self.fontsize  * 1.5)
          o.icon:SetLayer(100+menuid)
