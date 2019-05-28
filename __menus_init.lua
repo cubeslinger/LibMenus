@@ -3,6 +3,7 @@
 -- Author      marcob@marcob.org
 -- StartDate   24/07/2018
 --
+
 local addon, __menus = ...
 
 __menus.color     =  {  black       =  {  0,   0,   0,   1  },
@@ -41,6 +42,6 @@ __menus.borders	=  { l=4, r=4, t=4, b=4 }
    end
 
 
-__menus.f   =  {}
+__menus.f   			=  {}
 __menus.f.dumptable  =  dumptable
 __menus.f.menu       = __menus.menu
