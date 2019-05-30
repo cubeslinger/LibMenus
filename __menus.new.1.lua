@@ -74,8 +74,7 @@ function menu(parent, menuid, t)
 			self.o.context:SetStrata("topmost")
 
 			-- Main Window
--- 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "-" .. parent:GetName(), self.o.context)
-			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
+			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "-" .. parent:GetName(), self.o.context)
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
 			self.o.menu:SetLayer((100-1)+self.menuid)
@@ -97,6 +96,7 @@ function menu(parent, menuid, t)
 
 			for _, tbl in pairs(t.voices) do
 
+				local width                =  0
 				self.voiceid               =  self.voiceid + 1
 
 --	0.18.xx	-------------------------------------------------------------------------------------------------
@@ -108,7 +108,6 @@ function menu(parent, menuid, t)
 				o.icon      =  nil
 				o.text      =  nil
 				o.smicon    =  nil
-				flags			=	{ icon=false, text=false, smicon=false }
 
 -- 				o.container =  UI.CreateFrame("Frame", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_container", parent)                 -- Voice Container
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
@@ -122,8 +121,6 @@ function menu(parent, menuid, t)
 					o.icon:SetWidth(self.fontsize  * 1.5)
 					o.icon:SetLayer(100+self.menuid)
 					o.icon:SetBackgroundColor(unpack(__menus.color.black))
-					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
-					flags.icon = true
 				end
 
 				o.text	=  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_text", o.container)                       -- Voice Text
@@ -133,15 +130,12 @@ function menu(parent, menuid, t)
 				o.text:SetBackgroundColor(unpack(__menus.color.black))
 				--
 				o.text:SetLayer(100+self.menuid)
+				--
+				width  =  width + o.text:GetWidth()
+
 				-- highligth voice text
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
-				flags.text	=	true
-				if flags.icon == false then
-					o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
-				else
-					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT")
-				end
 
 				if tbl.callback ~= nil then
 
@@ -194,30 +188,14 @@ function menu(parent, menuid, t)
 					o.smicon:SetWidth(self.fontsize)
 					o.smicon:SetLayer(100+self.menuid)
 					o.smicon:SetBackgroundColor(unpack(__menus.color.black))
-					flags.smicon	=	true
-					o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+					width  =  width + o.smicon:GetWidth() + __menus.borders.l
 
 				end
 
-				if flags.icon == true then
+				if o.icon ~= nil then
 					o.container:SetHeight(math.max(o.text:GetHeight(), o.icon:GetHeight()))
 				else
-					if flags.smicon == true then
-						o.container:SetHeight(o.smicon:GetHeight())
-					else
-						if flags.text == true then
-							o.container:SetHeight(o.text:GetHeight())
-						end
-					end
-				end
-
-				-- enlarge text field to max available size
-				if	flags.text == true then
-					if flags.smicon == true  then
-						o.text:SetPoint('TOPRIGHT', o.smicon, 'TOPLEFT')
-					else
-						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
-					end
+					o.container:SetHeight(o.text:GetHeight())
 				end
 
 				self.voices[self.voiceid]	=	o
@@ -227,18 +205,45 @@ function menu(parent, menuid, t)
 	-- 			print("(1)" .. self.voiceid)
 
 				if self.voiceid == 1 then
-					-- first voice attaches to frame container with border spaces
+					-- first voice attaches to framecontainer with border spaces
 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
 					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
 				else
 					-- other voices attach to last one
--- 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
--- 					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
-
-					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
-					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
-
+					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
+					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
 				end
+
+	-- 			print("(2)" .. self.voiceid)
+
+				if self.voices[self.voiceid].icon ~= nil and next(self.voices[self.voiceid].icon)  ~= nil then
+					self.voices[self.voiceid].icon:SetPoint("TOPLEFT",  self.voices[self.voiceid].container, "TOPLEFT")
+					self.voices[self.voiceid].text:SetPoint("TOPLEFT",  self.voices[self.voiceid].icon, "TOPRIGHT", __menus.borders.l, 0)
+					self.voices[self.voiceid].text:SetPoint("TOPRIGHT", self.voices[self.voiceid].icon, "TOPRIGHT", __menus.borders.r, 0)
+				else
+					self.voices[self.voiceid].text:SetPoint("TOPLEFT",  self.voices[self.voiceid].container, "TOPLEFT")
+					self.voices[self.voiceid].text:SetPoint("TOPRIGHT", self.voices[self.voiceid].container, "TOPRIGHT", __menus.borders.r, 0)
+				end
+
+	-- 			print("(3)" .. self.voiceid)
+
+				-- Sub-Menu Icon
+				if type(tbl.callback) == 'string' and tbl.callback == "_submenu_" then
+					self.voices[self.voiceid].smicon:SetPoint("CENTERLEFT", self.voices[self.voiceid].text, "CENTERRIGHT")
+					self.voices[self.voiceid].smicon:SetPoint("CENTERLEFT", self.voices[self.voiceid].container,  "CENTERRIGHT")
+				else
+					self.voices[self.voiceid].text:SetPoint("TOPRIGHT",  self.voices[self.voiceid].container, "TOPRIGHT")
+				end
+
+	-- 			print("(4)" .. self.voiceid)
+
+				if self.voices[self.voiceid].icon ~= nil and next(self.voices[self.voiceid].icon) then
+					self.voices[self.voiceid].container:SetHeight(self.voices[self.voiceid].icon:GetHeight())
+				else
+					self.voices[self.voiceid].container:SetHeight(self.voices[self.voiceid].text:GetHeight())
+				end
+
+	-- 			print("(5)" .. self.voiceid)
 
  				lastvoiceframe =  self.voices[self.voiceid].container
 			end
@@ -249,8 +254,10 @@ function menu(parent, menuid, t)
 			-- Set Parent Height
 			local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
 			self.o.menu:SetHeight(h)
-
-			-- Hide newly created menu
+			-- Set Width for all menu voices
+			--       local idx   =  nil
+			--       for idx, _ in pairs(self.voices) do	self.voices[idx].container:SetWidth(self.maxwidth)	end
+			--
  			self.o.menu:SetVisible(false)
 		end
 
@@ -259,12 +266,23 @@ function menu(parent, menuid, t)
 
    -- Initialize
    if not self.initialized then
-      if parent ~= nil  and next(parent) ~= nil and t ~= nil  and next(t) ~= nil then
+      if parent ~= nil  and next(parent) ~= nil and
+         t      ~= nil  and next(t)      ~= nil then
 
+			print("Menu Init - First call to menu ---------------")
+			__menus.f.dumptable(t)
+			print("Menu Init - ----------------------------------")
+
+--          self  =  new(parent, menuid, t)
+
+-- 			local randommenuid	=	math.random(10000)
+-- 			self  =  new(parent, randommenuid, t)
 			self  =  new(parent,	t)
 
-			self.initialized  =  true
+--          self.initialized  =  true
       end
+
+		self.initialized  =  true
    end
 
    -- return the class instance
