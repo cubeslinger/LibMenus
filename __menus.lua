@@ -6,7 +6,7 @@
 
 local addon, __menus = ...
 
-function menu(parent, menuid, t)
+function menu(parent, t, subdata)
    -- the new instance
    local self =   {
                   o           =  {},
@@ -109,7 +109,6 @@ function menu(parent, menuid, t)
 				o.smicon    =  nil
 				flags			=	{ icon=false, text=false, smicon=false }
 
--- 				o.container =  UI.CreateFrame("Frame", "menu_" .. menuid .. "_voice_" .. self.voiceid .. "_container", parent)                 -- Voice Container
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
 				o.container:SetLayer(100+self.menuid)
 				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
@@ -131,6 +130,7 @@ function menu(parent, menuid, t)
 				o.text:SetFontColor(unpack(__menus.color.white))
 				o.text:SetBackgroundColor(unpack(__menus.color.black))
 				o.text:SetLayer(100+self.menuid)
+
 				-- highligth voice text
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
@@ -145,8 +145,9 @@ function menu(parent, menuid, t)
 
 					-- CALLBACK _SUBMENU_
 					if type(tbl.callback) == 'string' and  tbl.callback == "_submenu_" then
--- 							subarray	=	{	obj=o.text, submenu=tbl.submenu, menuid=mnuid, tblname=tbl.name }
-							table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+
+						--	subarray	=	{	obj=o.text, submenu=tbl.submenu, menuid=mnuid, tblname=tbl.name }
+-- 						table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						o.smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_smicon", o.container)                 -- Voice Sub-menu Icon
 						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
@@ -156,6 +157,8 @@ function menu(parent, menuid, t)
 						o.smicon:SetBackgroundColor(unpack(__menus.color.black))
 						flags.smicon	=	true
  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+
+						table.insert(submenuarray, {obj=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						local a, b = o.smicon:GetTexture()
 						print(string.format("smicon texture=(%s)(%s)(%s) parent=(%s)", o.smicon:GetName(), a, b,o.smicon:GetParent():GetName()))
@@ -199,20 +202,14 @@ function menu(parent, menuid, t)
 
 --	0.18.xx	-------------------------------------------------------------------------------------------------
 
-	-- 			print("(1)" .. self.voiceid)
-
 				if self.voiceid == 1 then
 					-- first voice attaches to frame container with border spaces
 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
 					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
 				else
 					-- other voices attach to last one
--- 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
--- 					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
-
-					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT")
-					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT")
-
+					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
+					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
 				end
 
  				lastvoiceframe =  self.voices[self.voiceid].container
@@ -227,37 +224,40 @@ function menu(parent, menuid, t)
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
--- 			self.o.menu:SetVisible(true)
+--  			self.o.menu:SetVisible(true)
 
 
 			-- delayed generation of nested sub-menus here --
 
--- 			for _, tbl in pairs(submenuarray) do
---
--- 				--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
---
--- 				if self.submenu 				 	== nil then self.submenu = {} 				end
--- 				if self.submenu[tbl.menuid]	==	nil then self.submenu[tbl.menuid] = {} end
---
--- 				table.insert(self.submenu[tbl.menuid], { [tbl.tblname] = {} })
---
--- 				print("Menu call to SUB Menu ---------------------BEGIN---")
--- -- 				print(string.format("menuid=%s self.submenu[self.menuid]=%s tbl.name=%s", tbl.menuid, tbl.submenu[tbl.menuid], tbl.tblname))
--- -- 				__menus.f.dumptable(tbl.tblsubmenu)
--- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu)
---
--- 				print("tbl.obj:GetName()=(" .. tbl.obj:GetName() .. ")")
--- 				print(string.format("self.submenu[%s][%s]", tbl.menuid, tbl.tblname))
--- 				tbl.obj:EventAttach( Event.UI.Input.Mouse.Left.Click,
--- 											function()
--- 			-- 									print(string.format("self.submenu[%s][%s]:flip()", menuid, tbl.name))
--- 	-- 											__menus.f.dumptable(self.submenu[self.menuid][tbl.name])
--- 												self.submenu[tbl.menuid][tbl.tblname]:flip()
--- 												print("!pIpPoNa!")
--- 											end,
--- 											"__menu: submenu " .. tbl.tblname )
--- 				print("Menu call to SUB Menu ----------------------END----")
--- 			end
+			for _, tbl in pairs(submenuarray) do
+
+				--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+
+				if self.submenu 				 	== nil then self.submenu = {} 				end
+				if self.submenu[tbl.menuid]	==	nil then self.submenu[tbl.menuid] = {} end
+
+				table.insert(self.submenu[tbl.menuid], { [tbl.tblname] = {} })
+
+				print("Menu call to SUB Menu ---------------------BEGIN---")
+-- 				print(string.format("menuid=%s self.submenu[self.menuid]=%s tbl.name=%s", tbl.menuid, tbl.submenu[tbl.menuid], tbl.tblname))
+-- 				__menus.f.dumptable(tbl.tblsubmenu)
+
+
+-- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu, {1})
+ 				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1})
+
+				print("tbl.obj:GetName()=(" .. tbl.obj:GetName() .. ")")
+				print(string.format("self.submenu[%s][%s]", tbl.menuid, tbl.tblname))
+				tbl.obj:EventAttach( Event.UI.Input.Mouse.Left.Click,
+											function()
+			-- 									print(string.format("self.submenu[%s][%s]:flip()", menuid, tbl.name))
+	-- 											__menus.f.dumptable(self.submenu[self.menuid][tbl.name])
+												self.submenu[tbl.menuid][tbl.tblname]:flip()
+												print(string.format("!pIpPoNa! tbl.menuid=%s tbl.tblname=%s objname=%s", tbl.menuid, tbl.tblname, self.submenu[tbl.menuid][tbl.tblname].o.menu:GetName()))
+											end,
+											"__menu: submenu " .. tbl.tblname )
+				print("Menu call to SUB Menu ----------------------END----")
+			end
 		end
 
       return self
@@ -267,7 +267,7 @@ function menu(parent, menuid, t)
    if not self.initialized then
       if parent ~= nil  and next(parent) ~= nil and t ~= nil  and next(t) ~= nil then
 
-			self  =  new(parent,	t)
+			self  =  new(parent,	t, subdata)
 
 			self.initialized  =  true
       end
