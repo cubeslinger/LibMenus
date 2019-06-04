@@ -277,6 +277,9 @@ function menu(parent, t, subdata, fathers)
 
 
 -- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu, {1})
+            
+            table.insert(self.fathers, self)
+            
  				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
 
 				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
