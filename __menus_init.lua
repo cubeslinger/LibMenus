@@ -41,7 +41,7 @@ __menus.borders	=  { l=4, r=4, t=4, b=4 }
       end
    end
 
-
+--	functions
 __menus.f   			=  {}
 __menus.f.dumptable  =  dumptable
 __menus.f.menu       = __menus.menu

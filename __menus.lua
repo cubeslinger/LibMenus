@@ -109,8 +109,8 @@ function menu(parent, t, subdata)
 
 -- 			local _, lastvoiceframe	=	_createvoices(self.o.menu, self.menuid, t)
 
-			if t.fontsize  ~= nil then self.fontsize  =  fontsize end
-			if t.fontface  ~= nil then self.fontface  =  fontface end
+			if t.fontsize  ~= nil then self.fontsize  =  t.fontsize end
+			if t.fontface  ~= nil then self.fontface  =  t.fontface end
 
 			lastvoiceframe =  self.o.menu
 
