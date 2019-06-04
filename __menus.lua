@@ -17,7 +17,8 @@ function menu(parent, t, subdata)
                   initialized =  false,
                   voices      =  {}, -- menu voice objects
                   submenu     =  {}, -- pointers to nested menus (_submenu_)
-						voiceid		=	0
+						voiceid		=	0,
+						childs		=	{}
                   }
 
 
@@ -28,11 +29,32 @@ function menu(parent, t, subdata)
       return floor(num * mult + .5) / mult
    end
 
-   function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    end end
-   function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(false)   end end
-   function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
-   function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end   end
-   function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end   end
+   function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    	end end
+--    function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self:flip()   							end end
+--    function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end end
+--    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end end
+--    function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
+   function self.hide()
+		if self.o.menu ~= nil and next(self.o.menu)	then
+			for _, obj in ipairs(self.childs) do
+				obj.o.menu:SetVisible(false)
+-- 				print(string.format("HIDING: (%s)", obj.o.menu:GetName()))
+			end
+			self.o.menu:SetVisible(false)
+		end
+	end
+
+   function self.flip()
+		if self.o.menu ~= nil and next(self.o.menu) then
+
+			if self.o.menu:GetVisible() == true then
+-- 				self.o.menu:hide()
+					self:hide()
+			else
+				self.o.menu:SetVisible(true)
+			end
+		end
+	end
 
    --
 	--	Usage:
@@ -59,7 +81,7 @@ function menu(parent, t, subdata)
 
 		else
 			self.menuid = math.random(10000)
- 			print(string.format("menuid=[%s]", self.menuid))
+--  			print(string.format("menuid=[%s]", self.menuid))
 
 			-- Is Parent a valid one?
 			if parent == nil or next(parent) == nil then parent   =  UIParent end
@@ -160,15 +182,21 @@ function menu(parent, t, subdata)
 
 						table.insert(submenuarray, {obj=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
-						local a, b = o.smicon:GetTexture()
-						print(string.format("smicon texture=(%s)(%s)(%s) parent=(%s)", o.smicon:GetName(), a, b,o.smicon:GetParent():GetName()))
+-- 						local a, b = o.smicon:GetTexture()
+-- 						print(string.format("smicon texture=(%s)(%s)(%s) parent=(%s)", o.smicon:GetName(), a, b,o.smicon:GetParent():GetName()))
 					else
 						-- CALLBACK FUNCTION
 						if type(tbl.callback)   == 'table'  then
 							o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
 														function()
-		-- 													print("menu function callback")
-															local func, param, trigger =  unpack(tbl.callback) func(param)
+															local func, param, trigger =  unpack(tbl.callback)
+															--
+															func(param)
+															--
+-- 															print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
+
+															if trigger == 'close' then self:hide()	end
+
 														end,
 														"__menu: callback" .. tbl.name )
 						else
@@ -238,7 +266,7 @@ function menu(parent, t, subdata)
 
 				table.insert(self.submenu[tbl.menuid], { [tbl.tblname] = {} })
 
-				print("Menu call to SUB Menu ---------------------BEGIN---")
+-- 				print("Menu call to SUB Menu ---------------------BEGIN---")
 -- 				print(string.format("menuid=%s self.submenu[self.menuid]=%s tbl.name=%s", tbl.menuid, tbl.submenu[tbl.menuid], tbl.tblname))
 -- 				__menus.f.dumptable(tbl.tblsubmenu)
 
@@ -246,17 +274,19 @@ function menu(parent, t, subdata)
 -- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu, {1})
  				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1})
 
-				print("tbl.obj:GetName()=(" .. tbl.obj:GetName() .. ")")
-				print(string.format("self.submenu[%s][%s]", tbl.menuid, tbl.tblname))
+				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
+
+-- 				print("tbl.obj:GetName()=(" .. tbl.obj:GetName() .. ")")
+-- 				print(string.format("self.submenu[%s][%s]", tbl.menuid, tbl.tblname))
 				tbl.obj:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
 			-- 									print(string.format("self.submenu[%s][%s]:flip()", menuid, tbl.name))
 	-- 											__menus.f.dumptable(self.submenu[self.menuid][tbl.name])
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
-												print(string.format("!pIpPoNa! tbl.menuid=%s tbl.tblname=%s objname=%s", tbl.menuid, tbl.tblname, self.submenu[tbl.menuid][tbl.tblname].o.menu:GetName()))
+-- 												print(string.format("!pIpPoNa! tbl.menuid=%s tbl.tblname=%s objname=%s", tbl.menuid, tbl.tblname, self.submenu[tbl.menuid][tbl.tblname].o.menu:GetName()))
 											end,
 											"__menu: submenu " .. tbl.tblname )
-				print("Menu call to SUB Menu ----------------------END----")
+-- 				print("Menu call to SUB Menu ----------------------END----")
 			end
 		end
 
@@ -276,3 +306,12 @@ function menu(parent, t, subdata)
    -- return the class instance
    return self
 end
+
+--[[
+Error: MaNo/__menus/__menus.lua:198: attempt to call method 'hide' (a nil value)
+    In MaNo / MaNo.menu_810_voice_6_text:Event.UI.Input.Mouse.Left.Click
+stack traceback:
+	[C]: in function 'hide'
+	MaNo/__menus/__menus.lua:198: in function <MaNo/__menus/__menus.lua:190>
+
+]]
