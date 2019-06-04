@@ -5,8 +5,8 @@
 --
 
 local addon, __menus = ...
-
-function menu(parent, t, subdata)
+--				    obj  tbl   tbl      tbl
+function menu(parent, t, subdata, fathers)
    -- the new instance
    local self =   {
                   o           =  {},
@@ -18,7 +18,8 @@ function menu(parent, t, subdata)
                   voices      =  {}, -- menu voice objects
                   submenu     =  {}, -- pointers to nested menus (_submenu_)
 						voiceid		=	0,
-						childs		=	{}
+						childs		=	{},
+						fathers		=	fathers or {}
                   }
 
 
@@ -37,6 +38,10 @@ function menu(parent, t, subdata)
    function self.hide()
 		if self.o.menu ~= nil and next(self.o.menu)	then
 			for _, obj in ipairs(self.childs) do
+				obj.o.menu:SetVisible(false)
+-- 				print(string.format("HIDING: (%s)", obj.o.menu:GetName()))
+			end
+			for _, obj in ipairs(self.fathers) do
 				obj.o.menu:SetVisible(false)
 -- 				print(string.format("HIDING: (%s)", obj.o.menu:GetName()))
 			end
@@ -72,7 +77,7 @@ function menu(parent, t, subdata)
 
 
 --    local function new(parent, menuid, t, subdata)
-   local function new(parent, t, subdata)
+   local function new(parent, t, subdata, fathers)
 
 		if parent == nil or t == nil or next(t) == nil then
 			print(string.format("ERROR: menu.new, parent is (%s), skipping.", parent))
@@ -272,7 +277,7 @@ function menu(parent, t, subdata)
 
 
 -- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu, {1})
- 				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1})
+ 				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
 
 				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
 
@@ -297,7 +302,7 @@ function menu(parent, t, subdata)
    if not self.initialized then
       if parent ~= nil  and next(parent) ~= nil and t ~= nil  and next(t) ~= nil then
 
-			self  =  new(parent,	t, subdata)
+			self  =  new(parent,	t, subdata, fathers)
 
 			self.initialized  =  true
       end
@@ -306,12 +311,3 @@ function menu(parent, t, subdata)
    -- return the class instance
    return self
 end
-
---[[
-Error: MaNo/__menus/__menus.lua:198: attempt to call method 'hide' (a nil value)
-    In MaNo / MaNo.menu_810_voice_6_text:Event.UI.Input.Mouse.Left.Click
-stack traceback:
-	[C]: in function 'hide'
-	MaNo/__menus/__menus.lua:198: in function <MaNo/__menus/__menus.lua:190>
-
-]]
