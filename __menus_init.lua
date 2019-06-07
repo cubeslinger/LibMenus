@@ -6,15 +6,15 @@
 
 local addon, __menus = ...
 
-__menus.color     =  {  black       =  {  0,   0,   0,   1  },
-                        grey        =  { .5,  .5,  .5,   1  },
-                        yellow      =  { .8,  .8,   0,   1  },
-                        green       =  {  0,  .8,   0,   1  },
-                        red         =  {  1,   0,   0,   1  },
-                        green       =  {  0,   1,   0,   1  },
-                        deepblack   =  {  0,   0,   0,   1  },
-                        white       =  {  1,   1,   1,   1  },
-                     }
+__menus.color     =  {  	black       =  {  0,   0,   0,   1  },
+											grey        =  { .5,  .5,  .5,   1  },
+											yellow      =  { .8,  .8,   0,   1  },
+											green       =  {  0,  .8,   0,   1  },
+											red         =  {  1,   0,   0,   1  },
+											green       =  {  0,   1,   0,   1  },
+											deepblack   =  {  0,   0,   0,   1  },
+											white       =  {  1,   1,   1,   1  },
+										}
 
 -- Left, Right, Top, Bottom
 __menus.borders	=  { l=4, r=4, t=4, b=4 }
@@ -43,5 +43,5 @@ __menus.borders	=  { l=4, r=4, t=4, b=4 }
 
 --	functions
 __menus.f   			=  {}
-__menus.f.dumptable  =  dumptable
-__menus.f.menu       = __menus.menu
+__menus.f.dumptable	=  dumptable
+--

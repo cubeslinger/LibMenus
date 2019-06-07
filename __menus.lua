@@ -5,7 +5,8 @@
 --
 
 local addon, __menus = ...
---				    obj  tbl   tbl      tbl
+
+--				    					  obj  tbl   tbl      tbl
 function menu(parent, t, subdata, fathers)
    -- the new instance
    local self =   {
@@ -23,12 +24,12 @@ function menu(parent, t, subdata, fathers)
                   }
 
 
-   local function round(num, digits)
-      local floor = math.floor
-      local mult = 10^(digits or 0)
-
-      return floor(num * mult + .5) / mult
-   end
+--    local function round(num, digits)
+--       local floor = math.floor
+--       local mult = 10^(digits or 0)
+--
+--       return floor(num * mult + .5) / mult
+--    end
 
    function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    	end end
 --    function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self:flip()   							end end
@@ -257,8 +258,6 @@ function menu(parent, t, subdata, fathers)
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
---  			self.o.menu:SetVisible(true)
-
 
 			-- delayed generation of nested sub-menus here --
 
@@ -271,30 +270,17 @@ function menu(parent, t, subdata, fathers)
 
 				table.insert(self.submenu[tbl.menuid], { [tbl.tblname] = {} })
 
--- 				print("Menu call to SUB Menu ---------------------BEGIN---")
--- 				print(string.format("menuid=%s self.submenu[self.menuid]=%s tbl.name=%s", tbl.menuid, tbl.submenu[tbl.menuid], tbl.tblname))
--- 				__menus.f.dumptable(tbl.tblsubmenu)
-
-
--- 				self.submenu[tbl.menuid][tbl.tblname]  =  new(tbl.obj, tbl.tblsubmenu, {1})
-            
             table.insert(self.fathers, self)
-            
+
  				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
 
 				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
 
--- 				print("tbl.obj:GetName()=(" .. tbl.obj:GetName() .. ")")
--- 				print(string.format("self.submenu[%s][%s]", tbl.menuid, tbl.tblname))
 				tbl.obj:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
-			-- 									print(string.format("self.submenu[%s][%s]:flip()", menuid, tbl.name))
-	-- 											__menus.f.dumptable(self.submenu[self.menuid][tbl.name])
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
--- 												print(string.format("!pIpPoNa! tbl.menuid=%s tbl.tblname=%s objname=%s", tbl.menuid, tbl.tblname, self.submenu[tbl.menuid][tbl.tblname].o.menu:GetName()))
 											end,
 											"__menu: submenu " .. tbl.tblname )
--- 				print("Menu call to SUB Menu ----------------------END----")
 			end
 		end
 
