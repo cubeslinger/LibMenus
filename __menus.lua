@@ -135,12 +135,11 @@ function menu(parent, t, subdata, fathers)
 				o.icon      =  nil
 				o.text      =  nil
 				o.smicon    =  nil
-				flags			=	{ icon=false, text=false, smicon=false }
+				flags			=	{ icon=false, text=false, smicon=false, check=nil }
 
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
 				o.container:SetLayer(100+self.menuid)
 				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
-
 
 				if tbl.check	~= nil	then
 					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
@@ -149,17 +148,19 @@ function menu(parent, t, subdata, fathers)
 					o.check:SetLayer(100+self.menuid)
 					o.check:SetBackgroundColor(unpack(__menus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
-					-- RiftCheckbox.Event:CheckboxChange
-					o.check:EventAttach(RiftCheckbox.Event:CheckboxChange,
-					                    function()
-													local func, param, trigger =  unpack(tbl.callback)
-													--
-													func(param)
-													--
--- 												print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
-												end,
-												"__menus: check change event" )
-					flags.check = true
+-- 					o.check:EventAttach(RiftCheckbox.Event.CheckboxChange,
+-- 					                    function()
+-- 													local func, param, trigger =  unpack(tbl.callback)
+-- 													--
+-- 													func(param)
+-- 													--
+-- -- 												print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
+-- 												end,
+-- 												"__menus: check change event" )
+					o.check:SetChecked(tbl.check)
+					flags.check = tbl.check
+
+					print("check added")
 				end
 
 				if tbl.icon   	~= nil   then
@@ -171,10 +172,10 @@ function menu(parent, t, subdata, fathers)
 					o.icon:SetBackgroundColor(unpack(__menus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
-					if flags.check == false then
-						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					if flags.check == nil then
+						o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					else
-						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+						o.icon:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
 					end
 				end
 
@@ -190,7 +191,7 @@ function menu(parent, t, subdata, fathers)
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__menus: highlight voice menu OFF")
 				flags.text	=	true
 				if flags.icon == false then
-					if flags.check == false then
+					if flags.check	==	nil	then
 						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					else
 						o.text:SetPoint("TOPLEFT", o.check, "TOPLEFT")
@@ -223,7 +224,11 @@ function menu(parent, t, subdata, fathers)
 					else
 						-- CALLBACK FUNCTION
 						if type(tbl.callback)   == 'table'  then
-							o.text:EventAttach(  Event.UI.Input.Mouse.Left.Click,
+
+							local OBJ	=	nil
+							if tbl.check	~=	nil	then	OBJ	=	o.check	else	OBJ 	=	o.text	end
+
+							OBJ:EventAttach(  Event.UI.Input.Mouse.Left.Click,
 														function()
 															local func, param, trigger =  unpack(tbl.callback)
 															--
@@ -330,3 +335,17 @@ function menu(parent, t, subdata, fathers)
    -- return the class instance
    return self
 end
+
+--[[
+Error: MaNo/__menus/__menus.lua:152: attempt to index global 'RiftCheckbox' (a nil value)
+    In MaNo / MaNo: startup event, event Event.Unit.Availability.Full
+stack traceback:
+	[C]: in function '__index'
+	MaNo/__menus/__menus.lua:152: in function 'new'
+	MaNo/__menus/__menus.lua:323: in function 'menu'
+	MaNo/__menus/__menus.lua:304: in function 'new'
+	MaNo/__menus/__menus.lua:323: in function 'menu'
+	MaNo/_mano_ui.lua:601: in function '__mano_ui'
+	MaNo/mano.lua:158: in function <MaNo/mano.lua:140>
+
+]]
