@@ -148,19 +148,9 @@ function menu(parent, t, subdata, fathers)
 					o.check:SetLayer(100+self.menuid)
 					o.check:SetBackgroundColor(unpack(__menus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
--- 					o.check:EventAttach(RiftCheckbox.Event.CheckboxChange,
--- 					                    function()
--- 													local func, param, trigger =  unpack(tbl.callback)
--- 													--
--- 													func(param)
--- 													--
--- -- 												print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
--- 												end,
--- 												"__menus: check change event" )
 					o.check:SetChecked(tbl.check)
 					flags.check = tbl.check
-
-					print("check added")
+-- 					print(string.format("flags.check=(%s)", flags.check))
 				end
 
 				if tbl.icon   	~= nil   then
@@ -190,14 +180,15 @@ function menu(parent, t, subdata, fathers)
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__menus: highlight voice menu ON")
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__menus: highlight voice menu OFF")
 				flags.text	=	true
+
 				if flags.icon == false then
 					if flags.check	==	nil	then
 						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					else
-						o.text:SetPoint("TOPLEFT", o.check, "TOPLEFT")
+						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
 					end
 				else
-					o.text:SetPoint("TOPLEFT", o.icon, "TOPLEFT")
+					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT")
 				end
 
 				if tbl.callback ~= nil then
@@ -266,6 +257,15 @@ function menu(parent, t, subdata, fathers)
 						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
 					end
 				end
+
+-- 				local w 		= 	0
+-- 				local flag 	=	nil
+-- 				for flag, val	in ipairs(flags) do
+-- 					if val 	==	true then
+-- 						w = w + o[flag].GetWidth()
+-- 					end
+-- 				end
+-- 				o.container:SetWidth(w)
 
 				self.voices[self.voiceid]	=	o
 
