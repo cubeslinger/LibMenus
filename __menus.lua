@@ -223,7 +223,7 @@ function menu(parent, t, subdata, fathers)
 														function()
 															local func, param, trigger =  unpack(tbl.callback)
 															--
-															func(param)
+															func(param, OBJ)
 															--
 -- 															print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
 
@@ -335,17 +335,3 @@ function menu(parent, t, subdata, fathers)
    -- return the class instance
    return self
 end
-
---[[
-Error: MaNo/__menus/__menus.lua:152: attempt to index global 'RiftCheckbox' (a nil value)
-    In MaNo / MaNo: startup event, event Event.Unit.Availability.Full
-stack traceback:
-	[C]: in function '__index'
-	MaNo/__menus/__menus.lua:152: in function 'new'
-	MaNo/__menus/__menus.lua:323: in function 'menu'
-	MaNo/__menus/__menus.lua:304: in function 'new'
-	MaNo/__menus/__menus.lua:323: in function 'menu'
-	MaNo/_mano_ui.lua:601: in function '__mano_ui'
-	MaNo/mano.lua:158: in function <MaNo/mano.lua:140>
-
-]]
