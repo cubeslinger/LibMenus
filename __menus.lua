@@ -68,8 +68,8 @@ function menu(parent, t, subdata, fathers)
    -- t  =  {  fontsize=[],                        -- defaults to
    --          fontface=[],                        -- defaults to Rift Font
    --          voices=< {
-   --                      { name="<voice1_name>", [callback={ <function>, <function_params> }, [icon="iconname.png.dds"]}
-   --                      { name="<voice2_name>", [callback={ <function>, <function_params> }, [icon="iconname.png.dds"] }
+   --                      { name="<voice1_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
+   --                      { name="<voice2_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
    --                      { name="<voice3_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
    --                      { ... },
    --                   } >,
@@ -141,7 +141,28 @@ function menu(parent, t, subdata, fathers)
 				o.container:SetLayer(100+self.menuid)
 				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
 
-				if tbl.icon   ~= nil   then
+
+				if tbl.check	~= nil	then
+					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
+					o.check:SetHeight(self.fontsize * 1.5)
+					o.check:SetWidth(self.fontsize  * 1.5)
+					o.check:SetLayer(100+self.menuid)
+					o.check:SetBackgroundColor(unpack(__menus.color.black))
+					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					-- RiftCheckbox.Event:CheckboxChange
+					o.check:EventAttach(RiftCheckbox.Event:CheckboxChange,
+					                    function()
+													local func, param, trigger =  unpack(tbl.callback)
+													--
+													func(param)
+													--
+-- 												print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
+												end,
+												"__menus: check change event" )
+					flags.check = true
+				end
+
+				if tbl.icon   	~= nil   then
 					o.icon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_icon", o.container)                     -- Voice Icon
 					o.icon:SetTexture('Rift', tbl.icon)
 					o.icon:SetHeight(self.fontsize * 1.5)
@@ -150,6 +171,11 @@ function menu(parent, t, subdata, fathers)
 					o.icon:SetBackgroundColor(unpack(__menus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
+					if flags.check == false then
+						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					else
+						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+					end
 				end
 
 				o.text	=  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_text", o.container)                       -- Voice Text
@@ -160,13 +186,17 @@ function menu(parent, t, subdata, fathers)
 				o.text:SetLayer(100+self.menuid)
 
 				-- highligth voice text
-				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__mouse: highlight voice menu ON")
-				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__mouse: highlight voice menu OFF")
+				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__menus: highlight voice menu ON")
+				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__menus: highlight voice menu OFF")
 				flags.text	=	true
 				if flags.icon == false then
-					o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					if flags.check == false then
+						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					else
+						o.text:SetPoint("TOPLEFT", o.check, "TOPLEFT")
+					end
 				else
-					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT")
+					o.text:SetPoint("TOPLEFT", o.icon, "TOPLEFT")
 				end
 
 				if tbl.callback ~= nil then
