@@ -10,32 +10,29 @@ local addon, __menus = ...
 function menu(parent, t, subdata, fathers)
    -- the new instance
    local self =   {
-                  o           =  {},
-                  fontsize    =  12,
-                  fontface    =  "",
-                  maxlen      =  0,
-                  basewidth   =  100,
-                  initialized =  false,
-                  voices      =  {}, -- menu voice objects
-                  submenu     =  {}, -- pointers to nested menus (_submenu_)
-						voiceid		=	0,
-						childs		=	{},
-						fathers		=	fathers or {}
+                  o           	=  {},
+                  fontsize    	=  12,
+                  fontface    	=  "",
+                  maxlen      	=  0,
+                  basewidth   	=  110,
+                  initialized 	=  false,
+                  voices      	=  {}, -- menu voice objects
+                  submenu     	=  {}, -- pointers to nested menus (_submenu_)
+						voiceid			=	0,
+						childs			=	{},
+						fathers			=	fathers or {},
+						lastvoicewidth	=	0,
                   }
 
+	self.maxwidth		=	self.basewidth
 
---    local function round(num, digits)
---       local floor = math.floor
---       local mult = 10^(digits or 0)
---
---       return floor(num * mult + .5) / mult
---    end
+   function self.show()
+		if self.o.menu ~= nil and next(self.o.menu) then
+			self.o.menu:SetVisible(true)
+		end
+		return
+	end
 
-   function self.show()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(true)    	end end
---    function self.hide()       if self.o.menu ~= nil and next(self.o.menu) then self:flip()   							end end
---    function self.GetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:GetVisible())   end end
---    function self.SetVisible() if self.o.menu ~= nil and next(self.o.menu) then return(self.o.menu:SetVisible())   end end
---    function self.flip()       if self.o.menu ~= nil and next(self.o.menu) then self.o.menu:SetVisible(not self.o.menu:GetVisible())   end end
    function self.hide()
 		if self.o.menu ~= nil and next(self.o.menu)	then
 			for _, obj in ipairs(self.childs) do
@@ -48,6 +45,7 @@ function menu(parent, t, subdata, fathers)
 			end
 			self.o.menu:SetVisible(false)
 		end
+		return
 	end
 
    function self.flip()
@@ -60,6 +58,7 @@ function menu(parent, t, subdata, fathers)
 				self.o.menu:SetVisible(true)
 			end
 		end
+		return
 	end
 
    --
@@ -111,9 +110,9 @@ function menu(parent, t, subdata, fathers)
 				self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 1)
 			end
 
---	0.18.xx	-------------------------------------------------------------------------------------------------
-
--- 			local _, lastvoiceframe	=	_createvoices(self.o.menu, self.menuid, t)
+			--
+			--
+			--
 
 			if t.fontsize  ~= nil then self.fontsize  =  t.fontsize end
 			if t.fontface  ~= nil then self.fontface  =  t.fontface end
@@ -126,9 +125,7 @@ function menu(parent, t, subdata, fathers)
 
 				self.voiceid               =  self.voiceid + 1
 
---	0.18.xx	-------------------------------------------------------------------------------------------------
-
--- 				self.voices[self.voiceid]  =  __createvoiceobjs(lastvoiceframe, menuid, tbl)
+				local	voicewidth	=	0
 
 				local o     =  {}
 				o.container =  nil
@@ -151,6 +148,7 @@ function menu(parent, t, subdata, fathers)
 					o.check:SetChecked(tbl.check)
 					flags.check = tbl.check
 -- 					print(string.format("flags.check=(%s)", flags.check))
+					voicewidth	=	o.check:GetWidth()
 				end
 
 				if tbl.icon   	~= nil   then
@@ -167,6 +165,7 @@ function menu(parent, t, subdata, fathers)
 					else
 						o.icon:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
 					end
+					voicewidth	=	voicewidth + o.icon:GetWidth()
 				end
 
 				o.text	=  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_text", o.container)                       -- Voice Text
@@ -180,6 +179,7 @@ function menu(parent, t, subdata, fathers)
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__menus: highlight voice menu ON")
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__menus: highlight voice menu OFF")
 				flags.text	=	true
+				voicewidth	=	voicewidth + o.text:GetWidth()
 
 				if flags.icon == false then
 					if flags.check	==	nil	then
@@ -207,6 +207,7 @@ function menu(parent, t, subdata, fathers)
 						o.smicon:SetBackgroundColor(unpack(__menus.color.black))
 						flags.smicon	=	true
  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+						voicewidth	=	voicewidth + o.smicon:GetWidth()
 
 						table.insert(submenuarray, {obj=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
@@ -258,38 +259,29 @@ function menu(parent, t, subdata, fathers)
 					end
 				end
 
--- 				local w 		= 	0
--- 				local flag 	=	nil
--- 				for flag, val	in ipairs(flags) do
--- 					if val 	==	true then
--- 						w = w + o[flag].GetWidth()
--- 					end
--- 				end
--- 				o.container:SetWidth(w)
+-- 				print(string.format("voicewidth=(%s)", voicewidth))
+-- 				o.container:SetWidth(voicewidth)
+				self.lastvoicewidth	=	voicewidth
 
 				self.voices[self.voiceid]	=	o
-
---	0.18.xx	-------------------------------------------------------------------------------------------------
 
 				if self.voiceid == 1 then
 					-- first voice attaches to frame container with border spaces
 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
-					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
+  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
 				else
 					-- other voices attach to last one
 					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
-					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
+  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
 				end
 
  				lastvoiceframe =  self.voices[self.voiceid].container
 			end
 
-
---	0.18.xx	-------------------------------------------------------------------------------------------------
-
 			-- Set Parent Height
 			local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
 			self.o.menu:SetHeight(h)
+-- 			self.o.menu:SetWidth(self.lastvoicewidth + __menus.borders.l + __menus.borders.r)
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
@@ -324,7 +316,10 @@ function menu(parent, t, subdata, fathers)
 
    -- Initialize
    if not self.initialized then
-      if parent ~= nil  and next(parent) ~= nil and t ~= nil  and next(t) ~= nil then
+      if parent 			~= nil  	and
+			next(parent) 	~=	nil	and
+			t 					~= nil  	and
+			next(t) 			~= nil 	then
 
 			self  =  new(parent,	t, subdata, fathers)
 
