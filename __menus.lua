@@ -22,58 +22,68 @@ function menu(parent, t, subdata, fathers)
 						childs			=	{},
 						fathers			=	fathers or {},
 						lastvoicewidth	=	0,
+						baselayer		=	0,
                   }
 
 	self.maxwidth		=	self.basewidth
 
+
+	function self.hidemenu()
+		self.o.menu:SetVisible(false)
+	end
+
+   function self.hidechilds()
+		if self.o.menu ~= nil and next(self.o.menu)	then
+			for _, obj in ipairs(self.childs) do
+				obj.o.menu:SetVisible(false)
+			end
+		end
+		return
+	end
+
+   function self.hidefathers()
+ 		if self.o.menu ~= nil and next(self.o.menu)	then
+			for _, obj in ipairs(self.fathers) do
+				obj.o.menu:SetVisible(false)
+			end
+		end
+		return
+	end
+
    function self.show()
+
+		self.hidechilds()
+		self.hidemenu()
+
 		if self.o.menu ~= nil and next(self.o.menu) then
 			self.o.menu:SetVisible(true)
+			local p	=	self.o.menu:GetParent()
 		end
 		return
 	end
 
    function self.hide()
-		if self.o.menu ~= nil and next(self.o.menu)	then
-			for _, obj in ipairs(self.childs) do
-				obj.o.menu:SetVisible(false)
--- 				print(string.format("HIDING: (%s)", obj.o.menu:GetName()))
-			end
-			for _, obj in ipairs(self.fathers) do
-				obj.o.menu:SetVisible(false)
--- 				print(string.format("HIDING: (%s)", obj.o.menu:GetName()))
-			end
-			self.o.menu:SetVisible(false)
-		end
+
+		self.hidechilds()
+		self.hidefathers()
+		self.hidemenu()
+
 		return
 	end
 
---    function self.flip()
--- 		if self.o.menu ~= nil and next(self.o.menu) then
---
--- 			if self.o.menu:GetVisible() == true then
--- -- 				self.o.menu:hide()
--- 					self:hide()
--- 			else
--- -- 				self.o.menu:SetVisible(true)
--- 				self.o.menu:show()
--- 			end
--- 		end
--- 		return
--- 	end
    function self.flip()
 		if self.o.menu ~= nil and next(self.o.menu) then
 
-			if self.o.menu:GetVisible() == true then
--- 				self.o.menu:hide()
-					self:hide()
+ 			if self.o.menu:GetVisible() == true then
+ 				self:hidechilds()
+				self:hidemenu()
 			else
--- 				self.o.menu:SetVisible(true)
 				self:show()
 			end
 		end
 		return
 	end
+
 
    --
 	--	Usage:
@@ -108,15 +118,22 @@ function menu(parent, t, subdata, fathers)
 			self.o.voices  =  {}
 			local fs       =  t.fontsize or self.fontsize
 
-			--Global context (root frame-thing).
-			self.o.context  = UI.CreateContext("menu_context_" .. self.menuid)
-			self.o.context:SetStrata("topmost")
+-- 			--Global context (root frame-thing).
+-- 			self.o.context  = UI.CreateContext("menu_context_" .. self.menuid)
+-- 			self.o.context:SetStrata("topmost")
 
-			-- Main Window
-			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
+			-- Root Object
+-- 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
+			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, parent)
+
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
-			self.o.menu:SetLayer((100-1)+self.menuid)
+-- 			self.o.menu:SetLayer((100-1)+self.menuid)
+-- 			__menus.f.dumptable(self.o.menu:GetStrataList())
+			local parentlayer	=	parent:GetLayer()
+			self.baselayer	=	parentlayer + 10
+			self.o.menu:SetLayer(self.baselayer + self.menuid)
+
 
 			if subdata and next(subdata)  then
 				self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT", __menus.borders.l, 0)
@@ -150,13 +167,15 @@ function menu(parent, t, subdata, fathers)
 
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
 				o.container:SetLayer(100+self.menuid)
+				o.container:SetLayer(self.baselayer + self.menuid)
 				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
 
 				if tbl.check	~= nil	then
 					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
 					o.check:SetHeight(self.fontsize * 1.5)
 					o.check:SetWidth(self.fontsize  * 1.5)
-					o.check:SetLayer(100+self.menuid)
+-- 					o.check:SetLayer(100+self.menuid)
+					o.check:SetLayer(self.baselayer + self.menuid)
 					o.check:SetBackgroundColor(unpack(__menus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					o.check:SetChecked(tbl.check)
@@ -170,7 +189,8 @@ function menu(parent, t, subdata, fathers)
 					o.icon:SetTexture('Rift', tbl.icon)
 					o.icon:SetHeight(self.fontsize * 1.5)
 					o.icon:SetWidth(self.fontsize  * 1.5)
-					o.icon:SetLayer(100+self.menuid)
+-- 					o.icon:SetLayer(100+self.menuid)
+					o.icon:SetLayer(self.baselayer + self.menuid)
 					o.icon:SetBackgroundColor(unpack(__menus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
@@ -187,7 +207,8 @@ function menu(parent, t, subdata, fathers)
 				o.text:SetFontSize(self.fontsize)
 				o.text:SetFontColor(unpack(__menus.color.white))
 				o.text:SetBackgroundColor(unpack(__menus.color.black))
-				o.text:SetLayer(100+self.menuid)
+-- 				o.text:SetLayer(100+self.menuid)
+				o.text:SetLayer(self.baselayer + self.menuid)
 
 				-- highligth voice text
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__menus: highlight voice menu ON")
@@ -217,7 +238,8 @@ function menu(parent, t, subdata, fathers)
 						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
 						o.smicon:SetHeight(self.fontsize)
 						o.smicon:SetWidth(self.fontsize)
-						o.smicon:SetLayer(100+self.menuid)
+-- 						o.smicon:SetLayer(100+self.menuid)
+						o.smicon:SetLayer(self.baselayer + self.menuid)
 						o.smicon:SetBackgroundColor(unpack(__menus.color.black))
 						flags.smicon	=	true
  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
@@ -232,7 +254,11 @@ function menu(parent, t, subdata, fathers)
 						if type(tbl.callback)   == 'table'  then
 
 							local OBJ	=	nil
-							if tbl.check	~=	nil	then	OBJ	=	o.check	else	OBJ 	=	o.text	end
+							if tbl.check	~=	nil	then
+								OBJ	=	o.check
+							else
+								OBJ 	=	o.text
+							end
 
 							OBJ:EventAttach(  Event.UI.Input.Mouse.Left.Click,
 														function()
@@ -242,7 +268,9 @@ function menu(parent, t, subdata, fathers)
 															--
 -- 															print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
 
-															if trigger == 'close' then self:hide()	end
+															if trigger == 'close' then
+																self:hide()
+															end
 
 														end,
 														"__menu: callback" .. tbl.name )
