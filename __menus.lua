@@ -48,6 +48,19 @@ function menu(parent, t, subdata, fathers)
 		return
 	end
 
+--    function self.flip()
+-- 		if self.o.menu ~= nil and next(self.o.menu) then
+--
+-- 			if self.o.menu:GetVisible() == true then
+-- -- 				self.o.menu:hide()
+-- 					self:hide()
+-- 			else
+-- -- 				self.o.menu:SetVisible(true)
+-- 				self.o.menu:show()
+-- 			end
+-- 		end
+-- 		return
+-- 	end
    function self.flip()
 		if self.o.menu ~= nil and next(self.o.menu) then
 
@@ -55,7 +68,8 @@ function menu(parent, t, subdata, fathers)
 -- 				self.o.menu:hide()
 					self:hide()
 			else
-				self.o.menu:SetVisible(true)
+-- 				self.o.menu:SetVisible(true)
+				self:show()
 			end
 		end
 		return
