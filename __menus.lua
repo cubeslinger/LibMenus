@@ -141,7 +141,7 @@ function menu(parent, t, subdata, fathers)
 
 			local	submenuarray		=	{}
 			local voiceidstoenlarge	=	{}
-			self.lastvoicewidth		=	self.maxwidth
+			self.maxvoicewidth		=	self.basewidth
 
 			for _, tbl in pairs(t.voices) do
 
@@ -282,7 +282,7 @@ function menu(parent, t, subdata, fathers)
 					end
 				end
 
-				self.lastvoicewidth	=	voicewidth
+				self.maxvoicewidth	=	math.max(voicewidth, self.maxvoicewidth)
 
 				self.voices[self.voiceid]	=	o
 				table.insert(voiceidstoenlarge, self.voiceid)
@@ -306,12 +306,15 @@ function menu(parent, t, subdata, fathers)
 
 			-- enlarge containers
 			for _, vid in ipairs(voiceidstoenlarge) do
-				print(string.format("Vid: (%s) voicewidth (%s)", vid, self.lastvoicewidth))
-				__menus.f.dumptable(self.voices[vid])
-
-				self.voices[vid].container:SetWidth(self.lastvoicewidth)
+-- 				print(string.format("Vid: (%s) voicewidth (%s)", vid, self.maxvoicewidth))
+-- 				__menus.f.dumptable(self.voices[vid])
+				self.voices[vid].container:SetWidth(self.maxvoicewidth)
 			end
-			self.lastvoicewidth	=
+			self.o.menu:SetWidth(self.maxvoicewidth + __menus.borders.l + __menus.borders.r)
+
+			--	reset voice size
+			self.maxvoicewidth	=	self.basewidth
+
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
