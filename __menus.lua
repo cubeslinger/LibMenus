@@ -119,12 +119,12 @@ function menu(parent, t, subdata, fathers)
 			local fs       =  t.fontsize or self.fontsize
 
 -- 			--Global context (root frame-thing).
--- 			self.o.context  = UI.CreateContext("menu_context_" .. self.menuid)
--- 			self.o.context:SetStrata("topmost")
+			self.o.context  = UI.CreateContext("menu_context_" .. self.menuid)
+			self.o.context:SetStrata("topmost")
 
 			-- Root Object
--- 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
-			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, parent)
+ 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
+-- 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, parent)
 
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
