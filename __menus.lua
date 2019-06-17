@@ -5,7 +5,20 @@
 --
 
 local addon, __menus = ...
-
+--
+--
+--	Usage:
+--
+-- t  =  {  fontsize=[],                        -- defaults to
+--          fontface=[],                        -- defaults to Rift Font
+--          voices=< {
+--                      { name="<voice1_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
+--                      { name="<voice2_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
+--                      { name="<voice3_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
+--                      { ... },
+--                   } >,
+--       }
+--
 --				    					  obj  tbl   tbl      tbl
 function menu(parent, t, subdata, fathers)
    -- the new instance
@@ -85,22 +98,6 @@ function menu(parent, t, subdata, fathers)
 	end
 
 
-   --
-	--	Usage:
-	--
-   -- t  =  {  fontsize=[],                        -- defaults to
-   --          fontface=[],                        -- defaults to Rift Font
-   --          voices=< {
-   --                      { name="<voice1_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
-   --                      { name="<voice2_name>", [callback={ <function>, <function_params> }, [check=true|false], [icon="iconname.png.dds"]}
-   --                      { name="<voice3_name>", [callback="_submenu_", submenu={ voices={<...>} }] }
-   --                      { ... },
-   --                   } >,
-   --       }
-   --
-
-
---    local function new(parent, menuid, t, subdata)
    local function new(parent, t, subdata, fathers)
 
 		if parent == nil or t == nil or next(t) == nil then
@@ -110,7 +107,6 @@ function menu(parent, t, subdata, fathers)
 
 		else
 			self.menuid = math.random(10000)
---  			print(string.format("menuid=[%s]", self.menuid))
 
 			-- Is Parent a valid one?
 			if parent == nil or next(parent) == nil then parent   =  UIParent end
@@ -118,18 +114,15 @@ function menu(parent, t, subdata, fathers)
 			self.o.voices  =  {}
 			local fs       =  t.fontsize or self.fontsize
 
--- 			--Global context (root frame-thing).
+			--	Global context (root frame-thing).
 			self.o.context  = UI.CreateContext("menu_context_" .. self.menuid)
 			self.o.context:SetStrata("topmost")
 
 			-- Root Object
  			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
--- 			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, parent)
 
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
--- 			self.o.menu:SetLayer((100-1)+self.menuid)
--- 			__menus.f.dumptable(self.o.menu:GetStrataList())
 			local parentlayer	=	parent:GetLayer()
 			self.baselayer	=	parentlayer + 10
 			self.o.menu:SetLayer(self.baselayer + self.menuid)
@@ -141,16 +134,14 @@ function menu(parent, t, subdata, fathers)
 				self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 1)
 			end
 
-			--
-			--
-			--
-
 			if t.fontsize  ~= nil then self.fontsize  =  t.fontsize end
 			if t.fontface  ~= nil then self.fontface  =  t.fontface end
 
 			lastvoiceframe =  self.o.menu
 
-			local	submenuarray	=	{}
+			local	submenuarray		=	{}
+			local voiceidstoenlarge	=	{}
+			self.lastvoicewidth		=	self.maxwidth
 
 			for _, tbl in pairs(t.voices) do
 
@@ -166,7 +157,6 @@ function menu(parent, t, subdata, fathers)
 				flags			=	{ icon=false, text=false, smicon=false, check=nil }
 
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
-				o.container:SetLayer(100+self.menuid)
 				o.container:SetLayer(self.baselayer + self.menuid)
 				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
 
@@ -174,13 +164,11 @@ function menu(parent, t, subdata, fathers)
 					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
 					o.check:SetHeight(self.fontsize * 1.5)
 					o.check:SetWidth(self.fontsize  * 1.5)
--- 					o.check:SetLayer(100+self.menuid)
 					o.check:SetLayer(self.baselayer + self.menuid)
 					o.check:SetBackgroundColor(unpack(__menus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					o.check:SetChecked(tbl.check)
 					flags.check = tbl.check
--- 					print(string.format("flags.check=(%s)", flags.check))
 					voicewidth	=	o.check:GetWidth()
 				end
 
@@ -189,7 +177,6 @@ function menu(parent, t, subdata, fathers)
 					o.icon:SetTexture('Rift', tbl.icon)
 					o.icon:SetHeight(self.fontsize * 1.5)
 					o.icon:SetWidth(self.fontsize  * 1.5)
--- 					o.icon:SetLayer(100+self.menuid)
 					o.icon:SetLayer(self.baselayer + self.menuid)
 					o.icon:SetBackgroundColor(unpack(__menus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
@@ -207,7 +194,6 @@ function menu(parent, t, subdata, fathers)
 				o.text:SetFontSize(self.fontsize)
 				o.text:SetFontColor(unpack(__menus.color.white))
 				o.text:SetBackgroundColor(unpack(__menus.color.black))
--- 				o.text:SetLayer(100+self.menuid)
 				o.text:SetLayer(self.baselayer + self.menuid)
 
 				-- highligth voice text
@@ -232,7 +218,7 @@ function menu(parent, t, subdata, fathers)
 					if type(tbl.callback) == 'string' and  tbl.callback == "_submenu_" then
 
 						--	subarray	=	{	obj=o.text, submenu=tbl.submenu, menuid=mnuid, tblname=tbl.name }
--- 						table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+						--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						o.smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_smicon", o.container)                 -- Voice Sub-menu Icon
 						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
@@ -246,9 +232,6 @@ function menu(parent, t, subdata, fathers)
 						voicewidth	=	voicewidth + o.smicon:GetWidth()
 
 						table.insert(submenuarray, {obj=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
-
--- 						local a, b = o.smicon:GetTexture()
--- 						print(string.format("smicon texture=(%s)(%s)(%s) parent=(%s)", o.smicon:GetName(), a, b,o.smicon:GetParent():GetName()))
 					else
 						-- CALLBACK FUNCTION
 						if type(tbl.callback)   == 'table'  then
@@ -266,8 +249,6 @@ function menu(parent, t, subdata, fathers)
 															--
 															func(param, OBJ)
 															--
--- 															print(string.format("---> func=(%s) param=(%s) trigger=(%s)", func, param, trigger))
-
 															if trigger == 'close' then
 																self:hide()
 															end
@@ -301,11 +282,10 @@ function menu(parent, t, subdata, fathers)
 					end
 				end
 
--- 				print(string.format("voicewidth=(%s)", voicewidth))
--- 				o.container:SetWidth(voicewidth)
 				self.lastvoicewidth	=	voicewidth
 
 				self.voices[self.voiceid]	=	o
+				table.insert(voiceidstoenlarge, self.voiceid)
 
 				if self.voiceid == 1 then
 					-- first voice attaches to frame container with border spaces
@@ -323,7 +303,15 @@ function menu(parent, t, subdata, fathers)
 			-- Set Parent Height
 			local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
 			self.o.menu:SetHeight(h)
--- 			self.o.menu:SetWidth(self.lastvoicewidth + __menus.borders.l + __menus.borders.r)
+
+			-- enlarge containers
+			for _, vid in ipairs(voiceidstoenlarge) do
+				print(string.format("Vid: (%s) voicewidth (%s)", vid, self.lastvoicewidth))
+				__menus.f.dumptable(self.voices[vid])
+
+				self.voices[vid].container:SetWidth(self.lastvoicewidth)
+			end
+			self.lastvoicewidth	=
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
