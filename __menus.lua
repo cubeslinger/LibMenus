@@ -221,7 +221,8 @@ function menu(parent, t, subdata, fathers)
 						--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						o.smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_smicon", o.container)                 -- Voice Sub-menu Icon
-						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
+-- 						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
+						o.smicon:SetTexture("Rift", "GuildFinder_I73.dds")
 						o.smicon:SetHeight(self.fontsize)
 						o.smicon:SetWidth(self.fontsize)
 -- 						o.smicon:SetLayer(100+self.menuid)
