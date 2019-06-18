@@ -43,14 +43,12 @@ function menu(P, t, subdata, fathers)
  	function self.addborders(frametomodify)
 
 		--	widths
-		local size	=	{}
-
-		size.height	=	{}
+		local size				=	{}
+		size.height				=	{}
 		size.height.corner	=	12
 		size.height.top 		=	size.height.corner
 		size.height.bottom 	=	size.height.corner
-
-		size.width	=	{}
+		size.width				=	{}
 		size.width.corner		=	12
 		size.width.left 		=	size.width.corner
 		size.width.right 		=	size.width.corner
@@ -62,7 +60,7 @@ function menu(P, t, subdata, fathers)
 		parent.bgcolor			=	{}
 		parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a	=	parent.obj:GetBackgroundColor()
 
-		local obj		=	{}
+		local obj				=	{}
 
 		--	long	borders
 		obj.t		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_top", 				parent.obj)
@@ -85,19 +83,6 @@ function menu(P, t, subdata, fathers)
 		obj.bl:SetLayer(parent.layer)
 		obj.br:SetLayer(parent.layer)
 
-		obj.t:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.b:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.l:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.r:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		--
-		obj.tl:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.tr:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.bl:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		obj.br:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
-		--
-
-		print(string.format("addon.name=(%s)", addon.name))
-		--
 		obj.t:SetTexture(addon.name, __menus.gfx.t)
 		obj.b:SetTexture(addon.name, __menus.gfx.b)
 		obj.l:SetTexture(addon.name, __menus.gfx.l)
@@ -108,39 +93,14 @@ function menu(P, t, subdata, fathers)
 		obj.bl:SetTexture(addon.name, __menus.gfx.bl)
 		obj.br:SetTexture(addon.name, __menus.gfx.br)
 		--
--- 		obj.tl:SetHeight(size.height.corner)
--- 		obj.tr:SetHeight(size.height.corner)
--- 		obj.bl:SetHeight(size.height.corner)
--- 		obj.br:SetHeight(size.height.corner)
--- 		--
--- 		obj.tl:SetWidth(size.width.corner)
--- 		obj.tr:SetWidth(size.width.corner)
--- 		obj.bl:SetWidth(size.width.corner)
--- 		obj.br:SetWidth(size.width.corner)
--- 		--
--- 		obj.t:SetHeight(size.height.top)
--- 		obj.b:SetHeight(size.height.bottom)
--- 		--
--- 		obj.l:SetWidth(size.width.left)
--- 		obj.r:SetWidth(size.width.right)
-		--
--- 		obj.tl:ClearAll()
--- 		obj.t:ClearAll()
--- 		obj.tr:ClearAll()
--- 		obj.l:ClearAll()
--- 		obj.r:ClearAll()
--- 		obj.bl:ClearAll()
--- 		obj.br:ClearAll()
--- 		obj.l:ClearAll()
--- 		obj.r:ClearAll()
 		--
 		--	top
 		obj.t:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPLEFT')
 		obj.t:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPRIGHT')
 		--	top left
-		obj.tl:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPLEFT')
+		obj.tl:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPLEFT')
 		--	top right
-		obj.tr:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPRIGHT')
+		obj.tr:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPRIGHT')
 		--	left
 		obj.l:SetPoint( 'TOPRIGHT', 		parent.obj, 'TOPLEFT')
 		obj.l:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'BOTTOMLEFT')
@@ -151,30 +111,9 @@ function menu(P, t, subdata, fathers)
 		obj.b:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMLEFT')
 		obj.b:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMRIGHT')
 		--	bottom left
-		obj.bl:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMLEFT')
-		obj.br:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMRIGHT')
-		--
--- 		print(string.format("Parent: 			obj=(%s)", 		parent.obj))
--- 		print(string.format("               layer=(%s)", 	parent.layer))
--- 		print(string.format("               name=(%s)", 	parent.name))
--- 		print(string.format("               bgcolor=(%s)", parent.bgcolor))
--- 		print(string.format("               top=(%s)", 		parent.obj:GetTop()))
--- 		print(string.format("               bottom=(%s)", 	parent.obj:GetBottom()))
--- 		print(string.format("               left=(%s)", 	parent.obj:GetLeft()))
--- 		print(string.format("               right=(%s)", 	parent.obj:GetRight()))
--- 		--
--- 		print(string.format("Top Object     top=(%s)", 		obj.t:GetTop()))
--- 		print(string.format("               bottom=(%s)", 	obj.t:GetBottom()))
--- 		print(string.format("               left=(%s)", 	obj.t:GetLeft()))
--- 		print(string.format("               right=(%s)", 	obj.t:GetRight()))
--- 		print(string.format("my parent is   name=(%s)", 	obj.t:GetParent():GetName()))
--- 		--
--- 		print(string.format("Bottom Object  top=(%s)", 		obj.b:GetTop()))
--- 		print(string.format("               bottom=(%s)", 	obj.b:GetBottom()))
--- 		print(string.format("               left=(%s)", 	obj.b:GetLeft()))
--- 		print(string.format("               right=(%s)", 	obj.b:GetRight()))
--- 		print(string.format("my parent is   name=(%s)", 	obj.b:GetParent():GetName()))
-		--
+		obj.bl:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMLEFT')
+		obj.br:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMRIGHT')
+
 		return
 	end
 
