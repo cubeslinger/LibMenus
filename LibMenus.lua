@@ -1,10 +1,10 @@
 --
--- Addon       __menus.lua
+-- Addon       LibMenus.lua
 -- Author      marcob@marcob.org
 -- StartDate   28/05/2019
 --
 
-local addon, __menus = ...
+-- local addon, LibMenus = ...
 --
 --
 --	Usage:
@@ -20,7 +20,7 @@ local addon, __menus = ...
 --       }
 --
 --				    					  obj  tbl   tbl      tbl
-function menu(P, t, subdata, fathers)
+function Library.LibMenus.menu(P, t, subdata, fathers)
    -- the new instance
    local self =   {
                   o           	=  {},
@@ -83,15 +83,15 @@ function menu(P, t, subdata, fathers)
 		obj.bl:SetLayer(parent.layer)
 		obj.br:SetLayer(parent.layer)
 
-		obj.t:SetTexture(addon.name, __menus.gfx.t)
-		obj.b:SetTexture(addon.name, __menus.gfx.b)
-		obj.l:SetTexture(addon.name, __menus.gfx.l)
-		obj.r:SetTexture(addon.name, __menus.gfx.r)
+		obj.t:SetTexture("LibMenus", 	Library.LibMenus.gfx.t)
+		obj.b:SetTexture("LibMenus", 	Library.LibMenus.gfx.b)
+		obj.l:SetTexture("LibMenus", 	Library.LibMenus.gfx.l)
+		obj.r:SetTexture("LibMenus", 	Library.LibMenus.gfx.r)
 		--
-		obj.tl:SetTexture(addon.name, __menus.gfx.tl)
-		obj.tr:SetTexture(addon.name, __menus.gfx.tr)
-		obj.bl:SetTexture(addon.name, __menus.gfx.bl)
-		obj.br:SetTexture(addon.name, __menus.gfx.br)
+		obj.tl:SetTexture("LibMenus", Library.LibMenus.gfx.tl)
+		obj.tr:SetTexture("LibMenus", Library.LibMenus.gfx.tr)
+		obj.bl:SetTexture("LibMenus", Library.LibMenus.gfx.bl)
+		obj.br:SetTexture("LibMenus", Library.LibMenus.gfx.br)
 		--
 		--
 		--	top
@@ -198,7 +198,7 @@ function menu(P, t, subdata, fathers)
 			-- Root Object
  			self.o.menu    =  UI.CreateFrame("Frame", "menu_" .. self.menuid, self.o.context)
 
-			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
+			self.o.menu:SetBackgroundColor(unpack(Library.LibMenus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
 			local Player	=	P:GetLayer()
 			self.baselayer	=	Player + 10
@@ -206,7 +206,7 @@ function menu(P, t, subdata, fathers)
 
 
 			if subdata and next(subdata)  then
-				self.o.menu:SetPoint("TOPLEFT", P, "TOPRIGHT", __menus.borders.l, 0)
+				self.o.menu:SetPoint("TOPLEFT", P, "TOPRIGHT", Library.LibMenus.borders.l, 0)
 			else
 				self.o.menu:SetPoint("TOPLEFT", P, "BOTTOMLEFT", 0, 1)
 			end
@@ -235,14 +235,14 @@ function menu(P, t, subdata, fathers)
 
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
 				o.container:SetLayer(self.baselayer + self.menuid)
-				o.container:SetBackgroundColor(unpack(__menus.color.deepblack))
+				o.container:SetBackgroundColor(unpack(Library.LibMenus.color.deepblack))
 
 				if tbl.check	~= nil	then
 					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
 					o.check:SetHeight(self.fontsize * 1.5)
 					o.check:SetWidth(self.fontsize  * 1.5)
 					o.check:SetLayer(self.baselayer + self.menuid)
-					o.check:SetBackgroundColor(unpack(__menus.color.black))
+					o.check:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					o.check:SetChecked(tbl.check)
 					flags.check = tbl.check
@@ -255,7 +255,7 @@ function menu(P, t, subdata, fathers)
 					o.icon:SetHeight(self.fontsize * 1.5)
 					o.icon:SetWidth(self.fontsize  * 1.5)
 					o.icon:SetLayer(self.baselayer + self.menuid)
-					o.icon:SetBackgroundColor(unpack(__menus.color.black))
+					o.icon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
 					if flags.check == nil then
@@ -269,13 +269,13 @@ function menu(P, t, subdata, fathers)
 				o.text	=  UI.CreateFrame("Text", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_text", o.container)                       -- Voice Text
 				o.text:SetText(tbl.name)
 				o.text:SetFontSize(self.fontsize)
-				o.text:SetFontColor(unpack(__menus.color.white))
-				o.text:SetBackgroundColor(unpack(__menus.color.black))
+				o.text:SetFontColor(unpack(Library.LibMenus.color.white))
+				o.text:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 				o.text:SetLayer(self.baselayer + self.menuid)
 
 				-- highligth voice text
-				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(__menus.color.grey))  end, "__menus: highlight voice menu ON")
-				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(__menus.color.black)) end, "__menus: highlight voice menu OFF")
+				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(Library.LibMenus.color.grey))  end, "LibMenus: highlight voice menu ON")
+				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.Out,  function() o.text:SetBackgroundColor(unpack(Library.LibMenus.color.black)) end, "LibMenus: highlight voice menu OFF")
 				flags.text	=	true
 				voicewidth	=	voicewidth + o.text:GetWidth()
 
@@ -304,7 +304,7 @@ function menu(P, t, subdata, fathers)
 						o.smicon:SetWidth(self.fontsize)
 -- 						o.smicon:SetLayer(100+self.menuid)
 						o.smicon:SetLayer(self.baselayer + self.menuid)
-						o.smicon:SetBackgroundColor(unpack(__menus.color.black))
+						o.smicon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 						flags.smicon	=	true
  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
 						voicewidth	=	voicewidth + o.smicon:GetWidth()
@@ -367,12 +367,12 @@ function menu(P, t, subdata, fathers)
 
 				if self.voiceid == 1 then
 					-- first voice attaches to frame container with border spaces
-					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     __menus.borders.l, __menus.borders.t)
-  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -__menus.borders.r, __menus.borders.t)
+					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "TOPLEFT",     Library.LibMenus.borders.l, Library.LibMenus.borders.t)
+  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "TOPRIGHT",    -Library.LibMenus.borders.r, Library.LibMenus.borders.t)
 				else
 					-- other voices attach to last one
-					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, __menus.borders.t)
-  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, __menus.borders.t)
+					self.voices[self.voiceid].container:SetPoint("TOPLEFT",   lastvoiceframe, "BOTTOMLEFT",  0, Library.LibMenus.borders.t)
+  					self.voices[self.voiceid].container:SetPoint("TOPRIGHT",  lastvoiceframe, "BOTTOMRIGHT", 0, Library.LibMenus.borders.t)
 				end
 
  				lastvoiceframe =  self.voices[self.voiceid].container
@@ -385,10 +385,10 @@ function menu(P, t, subdata, fathers)
 			-- enlarge containers
 			for _, vid in ipairs(voiceidstoenlarge) do
 -- 				print(string.format("Vid: (%s) voicewidth (%s)", vid, self.maxvoicewidth))
--- 				__menus.f.dumptable(self.voices[vid])
+-- 				Library.LibMenus.f.dumptable(self.voices[vid])
 				self.voices[vid].container:SetWidth(self.maxvoicewidth)
 			end
-			self.o.menu:SetWidth(self.maxvoicewidth + __menus.borders.l + __menus.borders.r)
+			self.o.menu:SetWidth(self.maxvoicewidth + Library.LibMenus.borders.l + Library.LibMenus.borders.r)
 
 			--	reset voice size
 			self.maxvoicewidth	=	self.basewidth
@@ -412,7 +412,7 @@ function menu(P, t, subdata, fathers)
 
             table.insert(self.fathers, self)
 
- 				self.submenu[tbl.menuid][tbl.tblname]  =  menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
+ 				self.submenu[tbl.menuid][tbl.tblname]  =  Library.LibMenus.menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
 
 				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
 
@@ -443,26 +443,3 @@ function menu(P, t, subdata, fathers)
    -- return the class instance
    return self
 end
-
-
---[[
-Error: Incorrect function usage.
-  Parameters: (userdata: 7f11d0e13140), "__menus", "gfx/rounded_top.png"
-  Parameter types: userdata, string, string
-Function documentation:
-	Sets the current texture used for this element.
-		Texture:SetTexture(source, texture)   -- string, string
-Parameters:
-		source:	The source of the resource. "Rift" will take the resource from Rift's internal data. Anything else will take the resource from the addon with that identifier.
-		texture:	The actual texture identifier. Either a resource identifier or a filename.
-    In MaNo / MaNo: startup event, event Event.Unit.Availability.Full
-stack traceback:
-	[C]: ?
-	[C]: in function 'SetTexture'
-	MaNo/__menus/__menus.lua:98: in function 'addborders'
-	MaNo/__menus/__menus.lua:449: in function 'new'
-	MaNo/__menus/__menus.lua:489: in function 'menu'
-	MaNo/_mano_ui.lua:630: in function '__mano_ui'
-	MaNo/mano.lua:159: in function <MaNo/mano.lua:141>
-
-]]

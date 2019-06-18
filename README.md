@@ -1,7 +1,7 @@
-RIFT - __menus.lua
+RIFT - LibMenus.lua
 
 Library to build menus.
 
 snailtail@typhiria
 
-07/06/2019
+18/06/2019

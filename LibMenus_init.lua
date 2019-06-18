@@ -1,12 +1,19 @@
 --
--- Addon       __menus_init.lua
+-- Addon       LibMenus_init.lua
 -- Author      marcob@marcob.org
 -- StartDate   24/07/2018
 --
 
-local addon, __menus = ...
+--	local addon, LibMenus = ...
 
-__menus.color     =  {  	black       =  {  0,   0,   0,   1  },
+-- Main initialization code for the library.
+
+if not Library then Library = {} end
+if not Library.LibMenus then Library.LibMenus = {} end
+
+
+
+Library.LibMenus.color     =  {  	black       =  {  0,   0,   0,   1  },
 											grey        =  { .5,  .5,  .5,   1  },
 											yellow      =  { .8,  .8,   0,   1  },
 											green       =  {  0,  .8,   0,   1  },
@@ -17,7 +24,7 @@ __menus.color     =  {  	black       =  {  0,   0,   0,   1  },
 										}
 
 -- Left, Right, Top, Bottom
-__menus.borders	=  { l=4, r=4, t=4, b=4 }
+Library.LibMenus.borders	=  { l=4, r=4, t=4, b=4 }
 
 -- local print indented nested tables
    function dumptable(tbl, indent)
@@ -42,12 +49,12 @@ __menus.borders	=  { l=4, r=4, t=4, b=4 }
    end
 
 --	functions
-__menus.f   			=  {}
-__menus.f.dumptable	=  dumptable
+Library.LibMenus.f   			=  {}
+Library.LibMenus.f.dumptable	=  dumptable
 --
 --	Border graphics
 --
-__menus.gfx		=	{}
+Library.LibMenus.gfx		=	{}
 -- 'line_window_break.png.dds'
 -- 'line_window_break.png.dds'
 -- 'dimension_permissions.png.dds'
@@ -58,13 +65,13 @@ __menus.gfx		=	{}
 -- 'RiftIcon_CornerBlur_LL.png.dds'
 -- 'RiftIcon_CornerBlur_LR.png.dds'
 --
-__menus.gfx.t	=	"gfx/rounded_top.png"
-__menus.gfx.b	=	"gfx/rounded_bottom.png"
-__menus.gfx.l	=	"gfx/rounded_left.png"
-__menus.gfx.r	=	"gfx/rounded_right.png"
-__menus.gfx.tl	=	"gfx/rounded_topleft.png"
-__menus.gfx.tr	=	"gfx/rounded_topright.png"
-__menus.gfx.bl	=	"gfx/rounded_bottomleft.png"
-__menus.gfx.br	=	"gfx/rounded_bottomright.png"
+Library.LibMenus.gfx.t	=	"gfx/rounded_top.png"
+Library.LibMenus.gfx.b	=	"gfx/rounded_bottom.png"
+Library.LibMenus.gfx.l	=	"gfx/rounded_left.png"
+Library.LibMenus.gfx.r	=	"gfx/rounded_right.png"
+Library.LibMenus.gfx.tl	=	"gfx/rounded_topleft.png"
+Library.LibMenus.gfx.tr	=	"gfx/rounded_topright.png"
+Library.LibMenus.gfx.bl	=	"gfx/rounded_bottomleft.png"
+Library.LibMenus.gfx.br	=	"gfx/rounded_bottomright.png"
 
 
