@@ -20,7 +20,7 @@ local addon, __menus = ...
 --       }
 --
 --				    					  obj  tbl   tbl      tbl
-function menu(parent, t, subdata, fathers)
+function menu(P, t, subdata, fathers)
    -- the new instance
    local self =   {
                   o           	=  {},
@@ -39,6 +39,144 @@ function menu(parent, t, subdata, fathers)
                   }
 
 	self.maxwidth		=	self.basewidth
+
+ 	function self.addborders(frametomodify)
+
+		--	widths
+		local size	=	{}
+
+		size.height	=	{}
+		size.height.corner	=	12
+		size.height.top 		=	size.height.corner
+		size.height.bottom 	=	size.height.corner
+
+		size.width	=	{}
+		size.width.corner		=	12
+		size.width.left 		=	size.width.corner
+		size.width.right 		=	size.width.corner
+
+		local parent 			=	{}
+		parent.obj				=	frametomodify
+		parent.layer			=	parent.obj:GetLayer()
+		parent.name				=	parent.obj:GetName()
+		parent.bgcolor			=	{}
+		parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a	=	parent.obj:GetBackgroundColor()
+
+		local obj		=	{}
+
+		--	long	borders
+		obj.t		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_top", 				parent.obj)
+		obj.b		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_bottom", 			parent.obj)
+		obj.l		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_left", 			parent.obj)
+		obj.r		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_right",			parent.obj)
+		--	corners
+		obj.tl	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_topleft", 		parent.obj)
+		obj.tr	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_topright", 		parent.obj)
+		obj.bl	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_bottomleft", 	parent.obj)
+		obj.br	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_bottomright",	parent.obj)
+
+		obj.t:SetLayer(parent.layer)
+		obj.b:SetLayer(parent.layer)
+		obj.l:SetLayer(parent.layer)
+		obj.r:SetLayer(parent.layer)
+		--
+		obj.tl:SetLayer(parent.layer)
+		obj.tr:SetLayer(parent.layer)
+		obj.bl:SetLayer(parent.layer)
+		obj.br:SetLayer(parent.layer)
+
+		obj.t:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.b:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.l:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.r:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		--
+		obj.tl:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.tr:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.bl:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		obj.br:SetBackgroundColor(parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a)
+		--
+
+		print(string.format("addon.name=(%s)", addon.name))
+		--
+		obj.t:SetTexture(addon.name, __menus.gfx.t)
+		obj.b:SetTexture(addon.name, __menus.gfx.b)
+		obj.l:SetTexture(addon.name, __menus.gfx.l)
+		obj.r:SetTexture(addon.name, __menus.gfx.r)
+		--
+		obj.tl:SetTexture(addon.name, __menus.gfx.tl)
+		obj.tr:SetTexture(addon.name, __menus.gfx.tr)
+		obj.bl:SetTexture(addon.name, __menus.gfx.bl)
+		obj.br:SetTexture(addon.name, __menus.gfx.br)
+		--
+-- 		obj.tl:SetHeight(size.height.corner)
+-- 		obj.tr:SetHeight(size.height.corner)
+-- 		obj.bl:SetHeight(size.height.corner)
+-- 		obj.br:SetHeight(size.height.corner)
+-- 		--
+-- 		obj.tl:SetWidth(size.width.corner)
+-- 		obj.tr:SetWidth(size.width.corner)
+-- 		obj.bl:SetWidth(size.width.corner)
+-- 		obj.br:SetWidth(size.width.corner)
+-- 		--
+-- 		obj.t:SetHeight(size.height.top)
+-- 		obj.b:SetHeight(size.height.bottom)
+-- 		--
+-- 		obj.l:SetWidth(size.width.left)
+-- 		obj.r:SetWidth(size.width.right)
+		--
+-- 		obj.tl:ClearAll()
+-- 		obj.t:ClearAll()
+-- 		obj.tr:ClearAll()
+-- 		obj.l:ClearAll()
+-- 		obj.r:ClearAll()
+-- 		obj.bl:ClearAll()
+-- 		obj.br:ClearAll()
+-- 		obj.l:ClearAll()
+-- 		obj.r:ClearAll()
+		--
+		--	top
+		obj.t:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPLEFT')
+		obj.t:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPRIGHT')
+		--	top left
+		obj.tl:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPLEFT')
+		--	top right
+		obj.tr:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPRIGHT')
+		--	left
+		obj.l:SetPoint( 'TOPRIGHT', 		parent.obj, 'TOPLEFT')
+		obj.l:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'BOTTOMLEFT')
+		--	right
+		obj.r:SetPoint( 'TOPLEFT', 		parent.obj, 'TOPRIGHT')
+		obj.r:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'BOTTOMRIGHT')
+		--	bottom
+		obj.b:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMLEFT')
+		obj.b:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMRIGHT')
+		--	bottom left
+		obj.bl:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMLEFT')
+		obj.br:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMRIGHT')
+		--
+-- 		print(string.format("Parent: 			obj=(%s)", 		parent.obj))
+-- 		print(string.format("               layer=(%s)", 	parent.layer))
+-- 		print(string.format("               name=(%s)", 	parent.name))
+-- 		print(string.format("               bgcolor=(%s)", parent.bgcolor))
+-- 		print(string.format("               top=(%s)", 		parent.obj:GetTop()))
+-- 		print(string.format("               bottom=(%s)", 	parent.obj:GetBottom()))
+-- 		print(string.format("               left=(%s)", 	parent.obj:GetLeft()))
+-- 		print(string.format("               right=(%s)", 	parent.obj:GetRight()))
+-- 		--
+-- 		print(string.format("Top Object     top=(%s)", 		obj.t:GetTop()))
+-- 		print(string.format("               bottom=(%s)", 	obj.t:GetBottom()))
+-- 		print(string.format("               left=(%s)", 	obj.t:GetLeft()))
+-- 		print(string.format("               right=(%s)", 	obj.t:GetRight()))
+-- 		print(string.format("my parent is   name=(%s)", 	obj.t:GetParent():GetName()))
+-- 		--
+-- 		print(string.format("Bottom Object  top=(%s)", 		obj.b:GetTop()))
+-- 		print(string.format("               bottom=(%s)", 	obj.b:GetBottom()))
+-- 		print(string.format("               left=(%s)", 	obj.b:GetLeft()))
+-- 		print(string.format("               right=(%s)", 	obj.b:GetRight()))
+-- 		print(string.format("my parent is   name=(%s)", 	obj.b:GetParent():GetName()))
+		--
+		return
+	end
 
 
 	function self.hidemenu()
@@ -98,10 +236,10 @@ function menu(parent, t, subdata, fathers)
 	end
 
 
-   local function new(parent, t, subdata, fathers)
+   local function new(P, t, subdata, fathers)
 
-		if parent == nil or t == nil or next(t) == nil then
-			print(string.format("ERROR: menu.new, parent is (%s), skipping.", parent))
+		if P == nil or t == nil or next(t) == nil then
+			print(string.format("ERROR: menu.new, P is (%s), skipping.", P))
 			print(string.format("ERROR: menu.new, t is (%s), skipping.", t))
 			print(string.format("ERROR: menu.new, next(%s) is (%s), skipping.", t, next(t)))
 
@@ -109,7 +247,7 @@ function menu(parent, t, subdata, fathers)
 			self.menuid = math.random(10000)
 
 			-- Is Parent a valid one?
-			if parent == nil or next(parent) == nil then parent   =  UIParent end
+			if P == nil or next(P) == nil then P   =  UIParent end
 
 			self.o.voices  =  {}
 			local fs       =  t.fontsize or self.fontsize
@@ -123,15 +261,15 @@ function menu(parent, t, subdata, fathers)
 
 			self.o.menu:SetBackgroundColor(unpack(__menus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
-			local parentlayer	=	parent:GetLayer()
-			self.baselayer	=	parentlayer + 10
+			local Player	=	P:GetLayer()
+			self.baselayer	=	Player + 10
 			self.o.menu:SetLayer(self.baselayer + self.menuid)
 
 
 			if subdata and next(subdata)  then
-				self.o.menu:SetPoint("TOPLEFT", parent, "TOPRIGHT", __menus.borders.l, 0)
+				self.o.menu:SetPoint("TOPLEFT", P, "TOPRIGHT", __menus.borders.l, 0)
 			else
-				self.o.menu:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 0, 1)
+				self.o.menu:SetPoint("TOPLEFT", P, "BOTTOMLEFT", 0, 1)
 			end
 
 			if t.fontsize  ~= nil then self.fontsize  =  t.fontsize end
@@ -302,7 +440,7 @@ function menu(parent, t, subdata, fathers)
 			end
 
 			-- Set Parent Height
-			local h     =  lastvoiceframe:GetBottom() - parent:GetTop()
+			local h     =  lastvoiceframe:GetBottom() - P:GetTop()
 			self.o.menu:SetHeight(h)
 
 			-- enlarge containers
@@ -316,6 +454,8 @@ function menu(parent, t, subdata, fathers)
 			--	reset voice size
 			self.maxvoicewidth	=	self.basewidth
 
+			--	attach borders
+			self.addborders(self.o.menu)
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
@@ -350,12 +490,12 @@ function menu(parent, t, subdata, fathers)
 
    -- Initialize
    if not self.initialized then
-      if parent 			~= nil  	and
-			next(parent) 	~=	nil	and
+      if P 			~= nil  	and
+			next(P) 	~=	nil	and
 			t 					~= nil  	and
 			next(t) 			~= nil 	then
 
-			self  =  new(parent,	t, subdata, fathers)
+			self  =  new(P,	t, subdata, fathers)
 
 			self.initialized  =  true
       end
@@ -364,3 +504,26 @@ function menu(parent, t, subdata, fathers)
    -- return the class instance
    return self
 end
+
+
+--[[
+Error: Incorrect function usage.
+  Parameters: (userdata: 7f11d0e13140), "__menus", "gfx/rounded_top.png"
+  Parameter types: userdata, string, string
+Function documentation:
+	Sets the current texture used for this element.
+		Texture:SetTexture(source, texture)   -- string, string
+Parameters:
+		source:	The source of the resource. "Rift" will take the resource from Rift's internal data. Anything else will take the resource from the addon with that identifier.
+		texture:	The actual texture identifier. Either a resource identifier or a filename.
+    In MaNo / MaNo: startup event, event Event.Unit.Availability.Full
+stack traceback:
+	[C]: ?
+	[C]: in function 'SetTexture'
+	MaNo/__menus/__menus.lua:98: in function 'addborders'
+	MaNo/__menus/__menus.lua:449: in function 'new'
+	MaNo/__menus/__menus.lua:489: in function 'menu'
+	MaNo/_mano_ui.lua:630: in function '__mano_ui'
+	MaNo/mano.lua:159: in function <MaNo/mano.lua:141>
+
+]]

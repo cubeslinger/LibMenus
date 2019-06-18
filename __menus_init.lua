@@ -45,3 +45,26 @@ __menus.borders	=  { l=4, r=4, t=4, b=4 }
 __menus.f   			=  {}
 __menus.f.dumptable	=  dumptable
 --
+--	Border graphics
+--
+__menus.gfx		=	{}
+-- 'line_window_break.png.dds'
+-- 'line_window_break.png.dds'
+-- 'dimension_permissions.png.dds'
+-- 'dimension_permissions.png.dds'
+-- --
+-- 'RiftIcon_CornerBlur_UL.png.dds'
+-- 'RiftIcon_CornerBlur_UR.png.dds'
+-- 'RiftIcon_CornerBlur_LL.png.dds'
+-- 'RiftIcon_CornerBlur_LR.png.dds'
+--
+__menus.gfx.t	=	"gfx/rounded_top.png"
+__menus.gfx.b	=	"gfx/rounded_bottom.png"
+__menus.gfx.l	=	"gfx/rounded_left.png"
+__menus.gfx.r	=	"gfx/rounded_right.png"
+__menus.gfx.tl	=	"gfx/rounded_topleft.png"
+__menus.gfx.tr	=	"gfx/rounded_topright.png"
+__menus.gfx.bl	=	"gfx/rounded_bottomleft.png"
+__menus.gfx.br	=	"gfx/rounded_bottomright.png"
+
+
