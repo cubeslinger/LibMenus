@@ -51,27 +51,3 @@ Library.LibMenus.borders	=  { l=4, r=4, t=4, b=4 }
 --	functions
 Library.LibMenus.f   			=  {}
 Library.LibMenus.f.dumptable	=  dumptable
---
---	Border graphics
---
-Library.LibMenus.gfx		=	{}
--- 'line_window_break.png.dds'
--- 'line_window_break.png.dds'
--- 'dimension_permissions.png.dds'
--- 'dimension_permissions.png.dds'
--- --
--- 'RiftIcon_CornerBlur_UL.png.dds'
--- 'RiftIcon_CornerBlur_UR.png.dds'
--- 'RiftIcon_CornerBlur_LL.png.dds'
--- 'RiftIcon_CornerBlur_LR.png.dds'
---
-Library.LibMenus.gfx.t	=	"gfx/rounded_top.png"
-Library.LibMenus.gfx.b	=	"gfx/rounded_bottom.png"
-Library.LibMenus.gfx.l	=	"gfx/rounded_left.png"
-Library.LibMenus.gfx.r	=	"gfx/rounded_right.png"
-Library.LibMenus.gfx.tl	=	"gfx/rounded_topleft.png"
-Library.LibMenus.gfx.tr	=	"gfx/rounded_topright.png"
-Library.LibMenus.gfx.bl	=	"gfx/rounded_bottomleft.png"
-Library.LibMenus.gfx.br	=	"gfx/rounded_bottomright.png"
-
-

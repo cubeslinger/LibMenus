@@ -40,83 +40,6 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
 	self.maxwidth		=	self.basewidth
 
- 	function self.addborders(frametomodify)
-
-		--	widths
-		local size				=	{}
-		size.height				=	{}
-		size.height.corner	=	12
-		size.height.top 		=	size.height.corner
-		size.height.bottom 	=	size.height.corner
-		size.width				=	{}
-		size.width.corner		=	12
-		size.width.left 		=	size.width.corner
-		size.width.right 		=	size.width.corner
-
-		local parent 			=	{}
-		parent.obj				=	frametomodify
-		parent.layer			=	parent.obj:GetLayer()
-		parent.name				=	parent.obj:GetName()
-		parent.bgcolor			=	{}
-		parent.bgcolor.r, parent.bgcolor.g, parent.bgcolor.b, parent.bgcolor.a	=	parent.obj:GetBackgroundColor()
-
-		local obj				=	{}
-
-		--	long	borders
-		obj.t		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_top", 				parent.obj)
-		obj.b		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_bottom", 			parent.obj)
-		obj.l		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_left", 			parent.obj)
-		obj.r		=	UI.CreateFrame("Texture", "border_" .. parent.name .. "_right",			parent.obj)
-		--	corners
-		obj.tl	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_topleft", 		parent.obj)
-		obj.tr	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_topright", 		parent.obj)
-		obj.bl	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_bottomleft", 	parent.obj)
-		obj.br	=	UI.CreateFrame("Texture", "corner_" .. parent.name .. "_bottomright",	parent.obj)
-
-		obj.t:SetLayer(parent.layer)
-		obj.b:SetLayer(parent.layer)
-		obj.l:SetLayer(parent.layer)
-		obj.r:SetLayer(parent.layer)
-		--
-		obj.tl:SetLayer(parent.layer)
-		obj.tr:SetLayer(parent.layer)
-		obj.bl:SetLayer(parent.layer)
-		obj.br:SetLayer(parent.layer)
-
-		obj.t:SetTexture("LibMenus", 	Library.LibMenus.gfx.t)
-		obj.b:SetTexture("LibMenus", 	Library.LibMenus.gfx.b)
-		obj.l:SetTexture("LibMenus", 	Library.LibMenus.gfx.l)
-		obj.r:SetTexture("LibMenus", 	Library.LibMenus.gfx.r)
-		--
-		obj.tl:SetTexture("LibMenus", Library.LibMenus.gfx.tl)
-		obj.tr:SetTexture("LibMenus", Library.LibMenus.gfx.tr)
-		obj.bl:SetTexture("LibMenus", Library.LibMenus.gfx.bl)
-		obj.br:SetTexture("LibMenus", Library.LibMenus.gfx.br)
-		--
-		--
-		--	top
-		obj.t:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPLEFT')
-		obj.t:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPRIGHT')
-		--	top left
-		obj.tl:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'TOPLEFT')
-		--	top right
-		obj.tr:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'TOPRIGHT')
-		--	left
-		obj.l:SetPoint( 'TOPRIGHT', 		parent.obj, 'TOPLEFT')
-		obj.l:SetPoint( 'BOTTOMRIGHT', 	parent.obj, 'BOTTOMLEFT')
-		--	right
-		obj.r:SetPoint( 'TOPLEFT', 		parent.obj, 'TOPRIGHT')
-		obj.r:SetPoint( 'BOTTOMLEFT', 	parent.obj, 'BOTTOMRIGHT')
-		--	bottom
-		obj.b:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMLEFT')
-		obj.b:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMRIGHT')
-		--	bottom left
-		obj.bl:SetPoint( 'TOPRIGHT', 		parent.obj, 'BOTTOMLEFT')
-		obj.br:SetPoint( 'TOPLEFT', 		parent.obj, 'BOTTOMRIGHT')
-
-		return
-	end
-
 
 	function self.hidemenu()
 		self.o.menu:SetVisible(false)
@@ -298,11 +221,9 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 						--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						o.smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_smicon", o.container)                 -- Voice Sub-menu Icon
--- 						o.smicon:SetTexture("Rift", "btn_arrow_R_(normal).png.dds")
 						o.smicon:SetTexture("Rift", "GuildFinder_I73.dds")
 						o.smicon:SetHeight(self.fontsize)
 						o.smicon:SetWidth(self.fontsize)
--- 						o.smicon:SetLayer(100+self.menuid)
 						o.smicon:SetLayer(self.baselayer + self.menuid)
 						o.smicon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 						flags.smicon	=	true
@@ -384,8 +305,6 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
 			-- enlarge containers
 			for _, vid in ipairs(voiceidstoenlarge) do
--- 				print(string.format("Vid: (%s) voicewidth (%s)", vid, self.maxvoicewidth))
--- 				Library.LibMenus.f.dumptable(self.voices[vid])
 				self.voices[vid].container:SetWidth(self.maxvoicewidth)
 			end
 			self.o.menu:SetWidth(self.maxvoicewidth + Library.LibMenus.borders.l + Library.LibMenus.borders.r)
@@ -394,7 +313,7 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 			self.maxvoicewidth	=	self.basewidth
 
 			--	attach borders
-			self.addborders(self.o.menu)
+			Library.LibBordify.addborders(self.o.menu)
 
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)

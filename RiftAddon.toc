@@ -1,13 +1,21 @@
 Identifier  =  "LibMenus"
 Name        =  { English = "LibMenus" }
 NameShort   =  "LibMenus"
-Version     =  "0.20.0"
+Version     =  "0.20.1"
 Description =  { English = "Library to build menus" }
 Author      =  "marcob@marcob.org"
 Website     =  "https://github.com/cubeslinger/__menus"
 Email       =  "marcob@marcob.org"
 Environment =  "4.0"
 
+
+Embed = {
+   LibBordify = true,
+}
+
+Dependencies = {
+   LibBordify = {"required", "before"},
+}
 
 RunOnStartup = {
    "LibMenus_init.lua",
