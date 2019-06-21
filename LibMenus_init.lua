@@ -13,7 +13,7 @@ if not Library.LibMenus then Library.LibMenus = {} end
 
 
 
-Library.LibMenus.color     =  {  	black       =  {  0,   0,   0,   1  },
+Library.LibMenus.color     =  {  black       =  {  0,   0,   0,   1  },
 											grey        =  { .5,  .5,  .5,   1  },
 											yellow      =  { .8,  .8,   0,   1  },
 											green       =  {  0,  .8,   0,   1  },
@@ -24,7 +24,10 @@ Library.LibMenus.color     =  {  	black       =  {  0,   0,   0,   1  },
 										}
 
 -- Left, Right, Top, Bottom
-Library.LibMenus.borders	=  { l=4, r=4, t=4, b=4 }
+Library.LibMenus.borders	=  { l=4,
+                                r=4,
+                                t=4,
+                                b=4 }
 
 -- local print indented nested tables
    function dumptable(tbl, indent)

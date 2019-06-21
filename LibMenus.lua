@@ -20,14 +20,14 @@
 --       }
 --
 --				    					  obj  tbl   tbl      tbl
-function Library.LibMenus.menu(P, t, subdata, fathers)
+function Library.LibMenus.menu(Parent, t, subdata, fathers)
    -- the new instance
    local self =   {
                   o           	=  {},
                   fontsize    	=  12,
                   fontface    	=  "",
                   maxlen      	=  0,
-                  basewidth   	=  110,
+                  basewidth   	=  100,
                   initialized 	=  false,
                   voices      	=  {}, -- menu voice objects
                   submenu     	=  {}, -- pointers to nested menus (_submenu_)
@@ -39,17 +39,20 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
                   }
 
 	self.maxwidth		=	self.basewidth
+	self.baseheight	=	self.fontsize
 
 
-	function self.hidemenu()
-		self.o.menu:SetVisible(false)
-	end
+	function self.hidemenu()	self.o.menu:SetVisible(false)	end
 
    function self.hidechilds()
-		if self.o.menu ~= nil and next(self.o.menu)	then
+-- 		if self.o.menu ~= nil and next(self.o.menu)	then
+		if self.childs ~= nil and next(self.childs)	then
 			for _, obj in ipairs(self.childs) do
 				obj.o.menu:SetVisible(false)
+				print(string.format("hiding (%s) of (%s)", obj.o.menu:GetName(), self.menuid))
 			end
+		else
+			print("Nothing to hide")
 		end
 		return
 	end
@@ -67,12 +70,12 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
 		self.hidechilds()
 		self.hidemenu()
-
 		if self.o.menu ~= nil and next(self.o.menu) then
 			self.o.menu:SetVisible(true)
-			local p	=	self.o.menu:GetParent()
+			print(string.format("Showing (%s)", self.menuid))
 		end
-		return
+
+	return
 	end
 
    function self.hide()
@@ -85,23 +88,27 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 	end
 
    function self.flip()
+
 		if self.o.menu ~= nil and next(self.o.menu) then
 
- 			if self.o.menu:GetVisible() == true then
- 				self:hidechilds()
+			if self.o.menu:GetVisible() == true then
+				self:hidechilds()
 				self:hidemenu()
+				print("Visbile->Hidden")
 			else
 				self:show()
+				print("Hidden->Visible")
 			end
 		end
+
 		return
 	end
 
 
-   local function new(P, t, subdata, fathers)
+   local function new(Parent, t, subdata, fathers)
 
-		if P == nil or t == nil or next(t) == nil then
-			print(string.format("ERROR: menu.new, P is (%s), skipping.", P))
+		if Parent == nil or t == nil or next(t) == nil then
+			print(string.format("ERROR: menu.new, Parent is (%s), skipping.", Parent))
 			print(string.format("ERROR: menu.new, t is (%s), skipping.", t))
 			print(string.format("ERROR: menu.new, next(%s) is (%s), skipping.", t, next(t)))
 
@@ -109,7 +116,7 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 			self.menuid = math.random(10000)
 
 			-- Is Parent a valid one?
-			if P == nil or next(P) == nil then P   =  UIParent end
+			if Parent == nil or next(Parent) == nil then Parent   =  UIParent end
 
 			self.o.voices  =  {}
 			local fs       =  t.fontsize or self.fontsize
@@ -123,15 +130,13 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
 			self.o.menu:SetBackgroundColor(unpack(Library.LibMenus.color.deepblack))
 			self.o.menu:SetWidth(self.basewidth)
-			local Player	=	P:GetLayer()
-			self.baselayer	=	Player + 10
-			self.o.menu:SetLayer(self.baselayer + self.menuid)
-
+			self.baselayer	=	10 + Parent:GetLayer()
+			self.o.menu:SetLayer(self.baselayer)
 
 			if subdata and next(subdata)  then
-				self.o.menu:SetPoint("TOPLEFT", P, "TOPRIGHT", Library.LibMenus.borders.l, 0)
+				self.o.menu:SetPoint("TOPLEFT", Parent, "TOPRIGHT", Library.LibMenus.borders.l, 0)
 			else
-				self.o.menu:SetPoint("TOPLEFT", P, "BOTTOMLEFT", 0, 1)
+				self.o.menu:SetPoint("TOPLEFT", Parent, "BOTTOMLEFT", 0, 1)
 			end
 
 			if t.fontsize  ~= nil then self.fontsize  =  t.fontsize end
@@ -154,17 +159,21 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 				o.icon      =  nil
 				o.text      =  nil
 				o.smicon    =  nil
-				flags			=	{ icon=false, text=false, smicon=false, check=nil }
+				flags			=	{	check		=	nil,
+				                  icon		=	false,
+				                  text		=	false,
+				                  smicon	=	false,
+				               }
 
 				o.container =  UI.CreateFrame("Frame", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_container", lastvoiceframe)            -- Voice Container
-				o.container:SetLayer(self.baselayer + self.menuid)
+				o.container:SetLayer(self.baselayer)
 				o.container:SetBackgroundColor(unpack(Library.LibMenus.color.deepblack))
 
 				if tbl.check	~= nil	then
 					o.check  =  UI.CreateFrame("RiftCheckbox", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_check", o.container)                  -- Voice Check (true|false)
 					o.check:SetHeight(self.fontsize * 1.5)
 					o.check:SetWidth(self.fontsize  * 1.5)
-					o.check:SetLayer(self.baselayer + self.menuid)
+					o.check:SetLayer(self.baselayer)
 					o.check:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					o.check:SetChecked(tbl.check)
@@ -177,7 +186,7 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 					o.icon:SetTexture('Rift', tbl.icon)
 					o.icon:SetHeight(self.fontsize * 1.5)
 					o.icon:SetWidth(self.fontsize  * 1.5)
-					o.icon:SetLayer(self.baselayer + self.menuid)
+					o.icon:SetLayer(self.baselayer)
 					o.icon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
@@ -194,7 +203,7 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 				o.text:SetFontSize(self.fontsize)
 				o.text:SetFontColor(unpack(Library.LibMenus.color.white))
 				o.text:SetBackgroundColor(unpack(Library.LibMenus.color.black))
-				o.text:SetLayer(self.baselayer + self.menuid)
+				o.text:SetLayer(self.baselayer)
 
 				-- highligth voice text
 				o.text:EventAttach(Event.UI.Input.Mouse.Cursor.In,   function() o.text:SetBackgroundColor(unpack(Library.LibMenus.color.grey))  end, "LibMenus: highlight voice menu ON")
@@ -217,20 +226,20 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 					-- CALLBACK _SUBMENU_
 					if type(tbl.callback) == 'string' and  tbl.callback == "_submenu_" then
 
-						--	subarray	=	{	obj=o.text, submenu=tbl.submenu, menuid=mnuid, tblname=tbl.name }
-						--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+						--	subarray	=	{ 	otext=o.text, 	osmicon=o.smicon,	menuid=self.menuid,	tblsubmenu=tbl.submenu,	tblname=tbl.name }
+						--	table.insert(submenuarray, {otext=o.text, osmicon=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 						o.smicon  =  UI.CreateFrame("Texture", "menu_" .. self.menuid .. "_voice_" .. self.voiceid .. "_smicon", o.container)                 -- Voice Sub-menu Icon
 						o.smicon:SetTexture("Rift", "GuildFinder_I73.dds")
 						o.smicon:SetHeight(self.fontsize)
 						o.smicon:SetWidth(self.fontsize)
-						o.smicon:SetLayer(self.baselayer + self.menuid)
+						o.smicon:SetLayer(self.baselayer)
 						o.smicon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 						flags.smicon	=	true
  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
 						voicewidth	=	voicewidth + o.smicon:GetWidth()
 
-						table.insert(submenuarray, {obj=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+						table.insert(submenuarray, {otext=o.text, osmicon=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 					else
 						-- CALLBACK FUNCTION
 						if type(tbl.callback)   == 'table'  then
@@ -260,19 +269,21 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 					end
 				end
 
-				if flags.icon == true then
-					o.container:SetHeight(math.max(o.text:GetHeight(), o.icon:GetHeight()))
-				else
-					if flags.smicon == true then
-						o.container:SetHeight(o.smicon:GetHeight())
-					else
-						if flags.text == true then
-							o.container:SetHeight(o.text:GetHeight())
-						end
-					end
-				end
-
-				-- enlarge text field to max available size
+				--
+				--	compute voice container height - begin
+				--
+				local height		=	self.baseheight
+				if flags.check		~=	nil 	then 	height	=	math.max(height, o.check:GetHeight())	end
+				if flags.icon		==	true 	then 	height	=	math.max(height, o.icon:GetHeight())	end
+				if flags.text		==	true 	then 	height	=	math.max(height, o.text:GetHeight())	end
+				if flags.smicon	==	true 	then	height	=	math.max(height, o.smicon:GetHeight())	end
+				o.container:SetHeight(height)
+				--
+				--	compute voice container height - end
+				--
+				--
+				-- enlarge text field to max available size	-	begin
+				--
 				if	flags.text == true then
 					if flags.smicon == true  then
 						o.text:SetPoint('TOPRIGHT', o.smicon, 'TOPLEFT')
@@ -280,6 +291,9 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
 					end
 				end
+				--
+				-- enlarge text field to max available size	-	end
+				--
 
 				self.maxvoicewidth	=	math.max(voicewidth, self.maxvoicewidth)
 
@@ -300,13 +314,15 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 			end
 
 			-- Set Parent Height
-			local h     =  lastvoiceframe:GetBottom() - P:GetTop()
+			local h     =  lastvoiceframe:GetBottom() - Parent:GetTop()
 			self.o.menu:SetHeight(h)
 
 			-- enlarge containers
 			for _, vid in ipairs(voiceidstoenlarge) do
 				self.voices[vid].container:SetWidth(self.maxvoicewidth)
 			end
+
+			-- add some space between menu and voices container
 			self.o.menu:SetWidth(self.maxvoicewidth + Library.LibMenus.borders.l + Library.LibMenus.borders.r)
 
 			--	reset voice size
@@ -322,7 +338,7 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
 			for _, tbl in pairs(submenuarray) do
 
-				--	table.insert(submenuarray, {obj=o.text, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
+				--	table.insert(submenuarray, {otext=o.text, osmicon=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
 				if self.submenu 				 	== nil then self.submenu = {} 				end
 				if self.submenu[tbl.menuid]	==	nil then self.submenu[tbl.menuid] = {} end
@@ -331,15 +347,23 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
             table.insert(self.fathers, self)
 
- 				self.submenu[tbl.menuid][tbl.tblname]  =  Library.LibMenus.menu(tbl.obj, tbl.tblsubmenu, {1}, self.fathers)
+ 				self.submenu[tbl.menuid][tbl.tblname]  =  Library.LibMenus.menu(tbl.osmicon, tbl.tblsubmenu, {1}, self.fathers)
 
-				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
 
-				tbl.obj:EventAttach( Event.UI.Input.Mouse.Left.Click,
+ 				table.insert(self.childs, self.submenu[tbl.menuid][tbl.tblname])
+
+				tbl.otext:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
 											end,
 											"__menu: submenu " .. tbl.tblname )
+
+				tbl.osmicon:EventAttach( Event.UI.Input.Mouse.Left.Click,
+											function()
+												self.submenu[tbl.menuid][tbl.tblname]:flip()
+											end,
+											"__menu: submenu " .. tbl.tblname )
+
 			end
 		end
 
@@ -348,12 +372,12 @@ function Library.LibMenus.menu(P, t, subdata, fathers)
 
    -- Initialize
    if not self.initialized then
-      if P 			~= nil  	and
-			next(P) 	~=	nil	and
+      if Parent			~= nil  	and
+			next(Parent) 	~=	nil	and
 			t 					~= nil  	and
 			next(t) 			~= nil 	then
 
-			self  =  new(P,	t, subdata, fathers)
+			self  =  new(Parent,	t, subdata, fathers)
 
 			self.initialized  =  true
       end
