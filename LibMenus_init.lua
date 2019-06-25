@@ -24,10 +24,10 @@ Library.LibMenus.color     =  {  black       =  {  0,   0,   0,   1  },
 										}
 
 -- Left, Right, Top, Bottom
-Library.LibMenus.borders	=  { l=4,
-                                r=4,
-                                t=4,
-                                b=4 }
+Library.LibMenus.borders	=  { l=6,
+                                r=6,
+                                t=6,
+                                b=6 }
 
 -- local print indented nested tables
    function dumptable(tbl, indent)

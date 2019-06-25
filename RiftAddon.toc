@@ -1,7 +1,7 @@
 Identifier  =  "LibMenus"
 Name        =  { English = "LibMenus" }
 NameShort   =  "LibMenus"
-Version     =  "0.20.4"
+Version     =  "0.20.5"
 Description =  { English = "Library to build menus" }
 Author      =  "marcob@marcob.org"
 Website     =  "https://github.com/cubeslinger/__menus"

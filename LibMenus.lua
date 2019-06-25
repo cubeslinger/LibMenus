@@ -174,7 +174,8 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 					o.check:SetWidth(self.fontsize  * 1.5)
 					o.check:SetLayer(self.baselayer)
 					o.check:SetBackgroundColor(unpack(Library.LibMenus.color.black))
-					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+-- 					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+					o.check:SetPoint("TOPLEFT", o.container, "TOPLEFT", Library.LibMenus.borders.l, 0)
 					o.check:SetChecked(tbl.check)
 					flags.check = tbl.check
 					voicewidth	=	o.check:GetWidth()
@@ -190,9 +191,11 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 					o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
 					flags.icon = true
 					if flags.check == nil then
-						o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+-- 						o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+						o.icon:SetPoint("TOPLEFT", o.container, "TOPLEFT", Library.LibMenus.borders.l, 0)
 					else
-						o.icon:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+-- 						o.icon:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+						o.icon:SetPoint("TOPLEFT", o.check, "TOPRIGHT", Library.LibMenus.borders.l, 0)
 					end
 					voicewidth	=	voicewidth + o.icon:GetWidth()
 				end
@@ -212,12 +215,15 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 
 				if flags.icon == false then
 					if flags.check	==	nil	then
-						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+-- 						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT")
+						o.text:SetPoint("TOPLEFT", o.container, "TOPLEFT", Library.LibMenus.borders.l, 0)
 					else
-						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+-- 						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT")
+						o.text:SetPoint("TOPLEFT", o.check, "TOPRIGHT", Library.LibMenus.borders.l, 0)
 					end
 				else
-					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT")
+-- 					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT")
+					o.text:SetPoint("TOPLEFT", o.icon, "TOPRIGHT", Library.LibMenus.borders.l, 0)
 				end
 
 				if tbl.callback ~= nil then
@@ -235,7 +241,8 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 						o.smicon:SetLayer(self.baselayer)
 						o.smicon:SetBackgroundColor(unpack(Library.LibMenus.color.black))
 						flags.smicon	=	true
- 						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+--  						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+ 						o.smicon:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT', -Library.LibMenus.borders.r, 0)
 						voicewidth	=	voicewidth + o.smicon:GetWidth()
 
 						table.insert(submenuarray, {otext=o.text, osmicon=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
@@ -287,7 +294,8 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 					if flags.smicon == true  then
 						o.text:SetPoint('TOPRIGHT', o.smicon, 'TOPLEFT')
 					else
-						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+-- 						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT')
+						o.text:SetPoint('TOPRIGHT', o.container, 'TOPRIGHT', -Library.LibMenus.borders.r, 0)
 					end
 				end
 				--
@@ -312,7 +320,7 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			end
 
 			-- Set Parent Height
-			local h     =  lastvoiceframe:GetBottom() - Parent:GetTop()
+			local h     =  (lastvoiceframe:GetBottom() - Parent:GetTop()) + (Library.LibMenus.borders.t + Library.LibMenus.borders.b)
 			self.o.menu:SetHeight(h)
 
 			-- enlarge containers
@@ -321,7 +329,7 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			end
 
 			-- add some space between menu and voices container
-			self.o.menu:SetWidth(self.maxvoicewidth + Library.LibMenus.borders.l + Library.LibMenus.borders.r)
+			self.o.menu:SetWidth(self.maxvoicewidth + (Library.LibMenus.borders.l * 2) + (Library.LibMenus.borders.r * 2))
 
 			--	reset voice size
 			self.maxvoicewidth	=	self.basewidth
