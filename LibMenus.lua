@@ -49,10 +49,10 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 		if self.childs ~= nil and next(self.childs)	then
 			for _, obj in ipairs(self.childs) do
 				obj.o.menu:SetVisible(false)
-				print(string.format("hiding (%s) of (%s)", obj.o.menu:GetName(), self.menuid))
+-- 				print(string.format("hiding (%s) of (%s)", obj.o.menu:GetName(), self.menuid))
 			end
-		else
-			print("Nothing to hide")
+-- 		else
+-- 			print("Nothing to hide")
 		end
 		return
 	end
@@ -72,7 +72,7 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 		self.hidemenu()
 		if self.o.menu ~= nil and next(self.o.menu) then
 			self.o.menu:SetVisible(true)
-			print(string.format("Showing (%s)", self.menuid))
+-- 			print(string.format("Showing (%s)", self.menuid))
 		end
 
 	return
@@ -94,10 +94,10 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			if self.o.menu:GetVisible() == true then
 				self:hidechilds()
 				self:hidemenu()
-				print("Visbile->Hidden")
+-- 				print("Visbile->Hidden")
 			else
 				self:show()
-				print("Hidden->Visible")
+-- 				print("Hidden->Visible")
 			end
 		end
 
@@ -111,7 +111,6 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			print(string.format("ERROR: menu.new, Parent is (%s), skipping.", Parent))
 			print(string.format("ERROR: menu.new, t is (%s), skipping.", t))
 			print(string.format("ERROR: menu.new, next(%s) is (%s), skipping.", t, next(t)))
-
 		else
 			self.menuid = math.random(10000)
 
@@ -294,7 +293,6 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 				--
 				-- enlarge text field to max available size	-	end
 				--
-
 				self.maxvoicewidth	=	math.max(voicewidth, self.maxvoicewidth)
 
 				self.voices[self.voiceid]	=	o
@@ -334,13 +332,16 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			-- Hide newly created menu
   			self.o.menu:SetVisible(false)
 
+			--
 			-- delayed generation of nested sub-menus here --
-
+			--
+			if self.submenu	==	nil	then	self.submenu = {}	end
+			--
 			for _, tbl in pairs(submenuarray) do
 
 				--	table.insert(submenuarray, {otext=o.text, osmicon=o.smicon, menuid=self.menuid, tblsubmenu=tbl.submenu, tblname=tbl.name})
 
-				if self.submenu 				 	== nil then self.submenu = {} 				end
+-- 				if self.submenu 				 	== nil then self.submenu = {} 				end
 				if self.submenu[tbl.menuid]	==	nil then self.submenu[tbl.menuid] = {} end
 
 				table.insert(self.submenu[tbl.menuid], { [tbl.tblname] = {} })
@@ -354,12 +355,14 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 
 				tbl.otext:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
+												self.hidechilds()
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
 											end,
 											"__menu: submenu " .. tbl.tblname )
 
 				tbl.osmicon:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
+												self.hidechilds()
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
 											end,
 											"__menu: submenu " .. tbl.tblname )
