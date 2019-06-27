@@ -94,23 +94,22 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 			if self.o.menu:GetVisible() == true then
 				self:hidechilds()
 				self:hidemenu()
--- 				print("Visbile->Hidden")
+--  				print("Visbile->Hidden")
 			else
 				self:show()
--- 				print("Hidden->Visible")
+--  				print("Hidden->Visible")
 			end
 		end
 
 		return
 	end
 
-
    local function new(Parent, t, subdata, fathers)
 
 		if Parent == nil or t == nil or next(t) == nil then
-			print(string.format("ERROR: menu.new, Parent is (%s), skipping.", Parent))
-			print(string.format("ERROR: menu.new, t is (%s), skipping.", t))
-			print(string.format("ERROR: menu.new, next(%s) is (%s), skipping.", t, next(t)))
+			print(string.format("LibMenus ERROR: menu.new, Parent is (%s), skipping.", Parent))
+			print(string.format("LibMenus ERROR: menu.new, t is (%s), skipping.", t))
+			print(string.format("LibMenus ERROR: menu.new, next(%s) is (%s), skipping.", t, next(t)))
 		else
 			self.menuid = math.random(10000)
 
@@ -268,9 +267,10 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 															end
 
 														end,
-														"__menu: callback" .. tbl.name )
+														"LibMenus: callback" .. tbl.name )
+
 						else
-							print(string.format("ERROR: type(%stbl.callback)=%s", tbl.callback, type(tbl.callback)))
+							print(string.format("LibMenus ERROR: type(%stbl.callback)=%s", tbl.callback, type(tbl.callback)))
 						end
 					end
 				end
@@ -366,14 +366,14 @@ function Library.LibMenus.menu(Parent, t, subdata, fathers)
 												self.hidechilds()
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
 											end,
-											"__menu: submenu " .. tbl.tblname )
+											"LibMenus: submenu " .. tbl.tblname )
 
 				tbl.osmicon:EventAttach( Event.UI.Input.Mouse.Left.Click,
 											function()
 												self.hidechilds()
 												self.submenu[tbl.menuid][tbl.tblname]:flip()
 											end,
-											"__menu: submenu " .. tbl.tblname )
+											"LibMenus: submenu " .. tbl.tblname )
 
 			end
 		end
